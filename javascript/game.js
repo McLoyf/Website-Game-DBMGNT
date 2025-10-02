@@ -17,25 +17,40 @@ function component(width, height, color, x, y) {
   this.height = height;
   this.x = x;
   this.y = y;
+  this.speedX = 0; // horizontal speed
+  this.speedY = 1; // vertical speed
   this.update = function(){
     let ctx = myGameArea.context;
     ctx.fillStyle = color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+  this.newPos = function(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    // keep inside canvas (clamp)
+    if (this.x < 0) this.x = 0;
+    if (this.y < 0) this.y = 0;
+    if (this.x + this.width > myGameArea.canvas.width) {
+      this.x = myGameArea.canvas.width - this.width;
+    }
+    if (this.y + this.height > myGameArea.canvas.height) {
+      this.y = myGameArea.canvas.height - this.height;
+    }
   }
 }
 
 let myGamePiece;
 
 function startGame() {
-  myGamePiece = new component(30, 30, "red", 10, 120); // create a red square
+  myGamePiece = new component(30, 30, "red", 10, 120);
   myGameArea.start();
 }
 
 function updateGameArea() {
   myGameArea.clear();
-  myGamePiece.x += 1;
+  myGamePiece.newPos(); // apply movement with bounds
   myGamePiece.update();
 }
 
-// start game when page loads
 window.onload = startGame;
