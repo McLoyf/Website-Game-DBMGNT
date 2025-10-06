@@ -1,4 +1,5 @@
 'use strict';
+document.addEventListener('DOMContentLoaded', function() {
 var canvas = document.querySelector('canvas');
 canvas.width = 640;
 canvas.height = 640;
@@ -12,7 +13,6 @@ var topMargin = 50;
 var colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magenta'];
 
 // --- Example shape data ---
-// A "T" shape in a 3x3 grid representation
 var Tshape = [
   [0, 1, 0],
   [1, 1, 1]
@@ -104,3 +104,4 @@ g.fillRect(0, 0, canvas.width, canvas.height);
 // drawShape(zShape, fallingShapeRow, fallingShapeCol, zColor);
 // drawShape(lShape, fallingShapeRow, fallingShapeCol, lColor);
 drawShape(jShape, fallingShapeRow, fallingShapeCol, jColor);
+});
