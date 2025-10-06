@@ -18,8 +18,8 @@ var Tshape = [
   [1, 1, 1]
 ];
 var tColor = colors[2]; // blue
-var fallingShapeRow = 5;
-var fallingShapeCol = 4;
+var fallingShapeRow = 6;
+var fallingShapeCol = 8;
 
 var Oshape = [
   [1,1,0],
