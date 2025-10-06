@@ -15,12 +15,52 @@ var colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magenta
 // A "T" shape in a 3x3 grid representation
 var Tshape = [
   [0, 1, 0],
-  [1, 1, 1],
-  [0, 0, 0]
+  [1, 1, 1]
 ];
-var shapeColor = colors[2]; // blue
+var tColor = colors[2]; // blue
 var fallingShapeRow = 5;
 var fallingShapeCol = 4;
+
+var Oshape = [
+  [1,1,0],
+  [1,1,0],
+];
+var oColor = colors[4]; // orange
+
+var iShape = [
+  [0,1,0],
+  [0,1,0],
+  [0,1,0],
+  [0,1,0]
+];
+var iColor = colors[5]; // blueviolet
+
+var sShape = [
+  [0,1,1],
+  [1,1,0]
+];
+var sColor = colors[1]; // red
+
+var zShape = [
+  [1,1,0],
+  [0,1,1]
+];
+var zColor = colors[0]; // green
+
+var lShape = [
+  [1,0,0],
+  [1,0,0],
+  [1,1,0]
+]
+var lColor = colors[3]; // purple
+
+var jShape = [
+  [0,1],
+  [0,1],
+  [1,1]
+];
+var jColor = colors[6]; // magenta
+
 
 // --- draw one square ---
 function drawBlock(x, y, color) {
@@ -56,5 +96,11 @@ function drawShape(shape, row, col, color) {
 g.fillStyle = '#DDEEFF';
 g.fillRect(0, 0, canvas.width, canvas.height);
 
-// --- draw the example block ---
-drawShape(Tshape, fallingShapeRow, fallingShapeCol, shapeColor);
+// --- draw the example blocks ---
+// drawShape(Tshape, fallingShapeRow, fallingShapeCol, tColor);
+// drawShape(Oshape, fallingShapeRow, fallingShapeCol, oColor);
+// drawShape(iShape, fallingShapeRow, fallingShapeCol, iColor);
+// drawShape(sShape, fallingShapeRow, fallingShapeCol, sColor);
+// drawShape(zShape, fallingShapeRow, fallingShapeCol, zColor);
+// drawShape(lShape, fallingShapeRow, fallingShapeCol, lColor);
+drawShape(jShape, fallingShapeRow, fallingShapeCol, jColor);
