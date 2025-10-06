@@ -1,107 +1,103 @@
 'use strict';
 document.addEventListener('DOMContentLoaded', function() {
-var canvas = document.querySelector('canvas');
-canvas.width = 620;
-canvas.height = 640;
-
-var g = canvas.getContext('2d');
-
-// --- constants from your setup ---
-var blockSize = 30;
-var leftMargin = 20;
-var topMargin = 50;
-var colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magenta'];
-
-// --- Example shape data ---
-var Tshape = [
-  [0, 1, 0],
-  [1, 1, 1]
-];
-var tColor = colors[2]; // blue
-var fallingShapeRow = 7;
-var fallingShapeCol = 8;
-
-var Oshape = [
-  [1,1,0],
-  [1,1,0],
-];
-var oColor = colors[4]; // orange
-
-var iShape = [
-  [0,1,0],
-  [0,1,0],
-  [0,1,0],
-  [0,1,0]
-];
-var iColor = colors[5]; // blueviolet
-
-var sShape = [
-  [0,1,1],
-  [1,1,0]
-];
-var sColor = colors[1]; // red
-
-var zShape = [
-  [1,1,0],
-  [0,1,1]
-];
-var zColor = colors[0]; // green
-
-var lShape = [
-  [1,0,0],
-  [1,0,0],
-  [1,1,0]
-]
-var lColor = colors[3]; // purple
-
-var jShape = [
-  [0,1],
-  [0,1],
-  [1,1]
-];
-var jColor = colors[6]; // magenta
+  const canvas = document.querySelector('canvas');
+  canvas.width = 620;
+  canvas.height = 650;
+  const g = canvas.getContext('2d');
 
 
-// --- draw one square ---
-function drawBlock(x, y, color) {
-  g.fillStyle = color;
-  g.fillRect(
-    leftMargin + x * blockSize,
-    topMargin + y * blockSize,
-    blockSize,
-    blockSize
-  );
-  g.strokeStyle = 'white';
-  g.lineWidth = 2;
-  g.strokeRect(
-    leftMargin + x * blockSize,
-    topMargin + y * blockSize,
-    blockSize,
-    blockSize
-  );
-}
+  const blockSize = 30;
+  const leftMargin = 20;
+  const topMargin = 50;
+  const colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magenta'];
+  const bgColor = '#DDEEFF';
+  const fallInterval = 800; // ms between downward moves
 
-// --- draw the shape on the grid ---
-function drawShape(shape, row, col, color) {
-  for (let r = 0; r < shape.length; r++) {
-    for (let c = 0; c < shape[r].length; c++) {
-      if (shape[r][c]) {
-        drawBlock(col + c, row + r, color);
+  // --- shapes ---
+  const shapes = [
+    { matrix: [[0,1,0],[1,1,1]], color: colors[2] }, // T
+    { matrix: [[1,1],[1,1]], color: colors[4] },     // O
+    { matrix: [[1],[1],[1],[1]], color: colors[5] }, // I
+    { matrix: [[0,1,1],[1,1,0]], color: colors[1] }, // S
+    { matrix: [[1,1,0],[0,1,1]], color: colors[0] }, // Z
+    { matrix: [[1,0,0],[1,0,0],[1,1,0]], color: colors[3] }, // L
+    { matrix: [[0,1],[0,1],[1,1]], color: colors[6] }        // J
+  ];
+
+  // --- current falling piece ---
+  let fallingShape = null;
+  let fallingShapeRow = 0;
+  let fallingShapeCol = 4;
+  let gridRows = Math.floor((canvas.height - topMargin) / blockSize);
+  let gridCols = Math.floor((canvas.width - leftMargin) / blockSize);
+
+  // --- draw one block ---
+  function drawBlock(x, y, color) {
+    g.fillStyle = color;
+    g.fillRect(leftMargin + x * blockSize, topMargin + y * blockSize, blockSize, blockSize);
+    g.strokeStyle = 'white';
+    g.lineWidth = 2;
+    g.strokeRect(leftMargin + x * blockSize, topMargin + y * blockSize, blockSize, blockSize);
+  }
+
+  // --- draw shape ---
+  function drawShape(shape, row, col, color) {
+    for (let r = 0; r < shape.length; r++) {
+      for (let c = 0; c < shape[r].length; c++) {
+        if (shape[r][c]) {
+          drawBlock(col + c, row + r, color);
+        }
       }
     }
   }
-}
 
-// --- background ---
-g.fillStyle = '#DDEEFF';
-g.fillRect(0, 0, canvas.width, canvas.height);
+  // --- clear background ---
+  function clearScreen() {
+    g.fillStyle = bgColor;
+    g.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
-// --- draw the example blocks ---
-// drawShape(Tshape, fallingShapeRow, fallingShapeCol, tColor);
-// drawShape(Oshape, fallingShapeRow, fallingShapeCol, oColor);
-// drawShape(iShape, fallingShapeRow, fallingShapeCol, iColor);
-// drawShape(sShape, fallingShapeRow, fallingShapeCol, sColor);
-// drawShape(zShape, fallingShapeRow, fallingShapeCol, zColor);
-// drawShape(lShape, fallingShapeRow, fallingShapeCol, lColor);
-drawShape(jShape, fallingShapeRow, fallingShapeCol, jColor);
+  // --- spawn new shape ---
+  function spawnShape() {
+    const next = shapes[Math.floor(Math.random() * shapes.length)];
+    fallingShape = next.matrix;
+    fallingShapeRow = 0;
+    fallingShapeCol = Math.floor(gridCols / 2) - 2;
+    fallingShape.color = next.color;
+  }
+
+  // --- draw current game state ---
+  function update() {
+    clearScreen();
+    if (fallingShape) {
+      drawShape(fallingShape, fallingShapeRow, fallingShapeCol, fallingShape.color);
+    }
+  }
+
+  // --- fall logic ---
+  function fall() {
+    if (!fallingShape) return;
+
+    // check if we hit bottom
+    const bottomRow = fallingShapeRow + fallingShape.length;
+    if (bottomRow * blockSize + topMargin >= canvas.height - 5) {
+      // landed -> spawn new
+      spawnShape();
+      update();
+      return;
+    }
+
+    // otherwise move down
+    fallingShapeRow++;
+    update();
+  }
+
+  // --- start game ---
+  function startGame() {
+    spawnShape();
+    update();
+    setInterval(fall, fallInterval);
+  }
+
+  startGame();
 });
