@@ -1,7 +1,7 @@
 'use strict';
 document.addEventListener('DOMContentLoaded', function() {
 var canvas = document.querySelector('canvas');
-canvas.width = 640;
+canvas.width = 620;
 canvas.height = 640;
 
 var g = canvas.getContext('2d');
@@ -18,7 +18,7 @@ var Tshape = [
   [1, 1, 1]
 ];
 var tColor = colors[2]; // blue
-var fallingShapeRow = 6;
+var fallingShapeRow = 7;
 var fallingShapeCol = 8;
 
 var Oshape = [
