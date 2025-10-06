@@ -1,5 +1,4 @@
 'use strict';
-document.addEventListener('DOMContentLoaded', function() {
   const canvas = document.querySelector('canvas');
   canvas.width = 620;
   canvas.height = 650;
@@ -91,7 +90,34 @@ document.addEventListener('DOMContentLoaded', function() {
     fallingShapeRow++;
     update();
   }
+  function rotateShape(){
+    
+  }
 
+  window.addEventListener('keydown', function(a){
+    if(a.code == 'KeyA'){
+      fallingShapeCol -= 1;
+      update();
+    }
+  });
+
+  window.addEventListener('keydown', function(d){
+    if(d.code == 'KeyD'){
+      fallingShapeCol += 1;
+      update();
+    }
+  });
+
+  window.addEventListener('keydown', function(s){
+    if(s.code == 'KeyS'){
+      fallingShapeRow += 1;
+      update();
+    }
+  });
+
+  window.addEventListener('keydown', function(w){
+    //TODO: implement this later
+  })
   // --- start game ---
   function startGame() {
     spawnShape();
@@ -100,4 +126,3 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   startGame();
-});
