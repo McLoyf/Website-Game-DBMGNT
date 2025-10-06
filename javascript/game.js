@@ -68,6 +68,14 @@
   // --- draw current game state ---
   function update() {
     clearScreen();
+
+  for (let r = 0; r < gridRows; r++) {
+    for (let c = 0; c < gridCols; c++) {
+      if (grid[r][c]) {
+        drawBlock(c, r, grid[r][c]); // draw color stored in grid
+      }
+    }
+  }
     if (fallingShape) {
       drawShape(fallingShape, fallingShapeRow, fallingShapeCol, fallingShape.color);
     }
@@ -77,10 +85,9 @@
   function fall() {
     if (!fallingShape) return;
 
-    // check if we hit bottom
-    const bottomRow = fallingShapeRow + fallingShape.length;
-    if (bottomRow * blockSize + topMargin >= canvas.height - 5) {
-      // landed -> spawn new
+    if(isCollision(fallingShape, fallingShapeRow + 1, fallingShapeCol)){
+      mergeShapeIntoGrid(fallingShape,fallingShapeRow, fallingShapeCol,fallingShape.color);
+
       spawnShape();
       update();
       return;
@@ -90,8 +97,53 @@
     fallingShapeRow++;
     update();
   }
+
+/*TODO: Fix the collision as it's a bit shit right now.
+Known issues with collision: Clipping under game area which softlocks the game, clipping into other blocks which is very apparent when the blocks get stacked to top of screen*/
+
+function isCollision(shape, nextRow, nextCol) {
+  for (let r = 0; r < shape.length; r++) {
+    for (let c = 0; c < shape[r].length; c++) {
+      if (shape[r][c]) {
+        let newRow = nextRow + r;
+        let newCol = nextCol + c;
+
+        // bottom collision
+        if (newRow >= gridRows) {
+          return true;
+        }
+
+        // side collision
+        if (newCol < 0 || newCol >= gridCols) {
+          return true;
+        }
+
+        // block-on-block collision
+        if (grid[newRow][newCol]) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function mergeShapeIntoGrid(shape, row, col, color) {
+  for (let r = 0; r < shape.length; r++) {
+    for (let c = 0; c < shape[r].length; c++) {
+      if (shape[r][c]) {
+        grid[row + r][col + c] = color;
+      }
+    }
+  }
+}
+
+  let grid = [];
+  for(let r = 0; r< gridRows; r++){
+    grid[r] = new Array(gridCols).fill(null);
+  }
+
   function rotateShape(){
-    
   }
 
   window.addEventListener('keydown', function(a){
