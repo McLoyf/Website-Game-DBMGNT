@@ -2,19 +2,23 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Game</title>
-    <script src="./javascript/game.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Game</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <canvas></canvas>
-    <script src="./javascript/game.js"></script>
-    <br>
-    <a href=".\pages\login.html">Login</a>
-    <br>
-    <a href=".\pages\signup.html">Signup</a>
+  <div class="page-content">
+    <canvas id="game"></canvas>
+
+    <div class="bottom-link">
+      <a href="./pages/login.html">Login</a>
+      <a href="./pages/signup.html">Signup</a>
+    </div>
+  </div>
+
+  <script src="./javascript/game.js"></script>
 </body>
 
 </html>
