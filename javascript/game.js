@@ -153,8 +153,22 @@ function mergeShapeIntoGrid(shape, row, col, color) {
     }
   });
 
+   window.addEventListener('keydown', function(left){
+    if(left.code == 'ArrowLeft'){
+      fallingShapeCol -= 1;
+      update();
+    }
+  });
+
   window.addEventListener('keydown', function(d){
     if(d.code == 'KeyD'){
+      fallingShapeCol += 1;
+      update();
+    }
+  });
+
+  window.addEventListener('keydown', function(right){
+    if(right.code == 'ArrowRight'){
       fallingShapeCol += 1;
       update();
     }
@@ -167,7 +181,18 @@ function mergeShapeIntoGrid(shape, row, col, color) {
     }
   });
 
+   window.addEventListener('keydown', function(down){
+    if(down.code == 'ArrowDown'){
+      fallingShapeRow += 1;
+      update();
+    }
+  });
+
   window.addEventListener('keydown', function(w){
+    //TODO: implement this later
+  })
+
+  window.addEventListener('keydown', function(up){
     //TODO: implement this later
   })
   // --- start game ---
