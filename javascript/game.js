@@ -12,7 +12,7 @@
   const topMargin = 50;
   const colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magenta'];
   const bgColor = '#DDEEFF';
-  const fallInterval = 800; // ms between downward moves
+  const fallInterval = 750; // ms between downward moves
   let scoreValue = 0; 
 
   // --- shapes ---
@@ -108,7 +108,7 @@
   }
 
 /*TODO: Fix the collision as it's a bit shit right now.
-Known issues with collision: Clipping under game area which softlocks the game, clipping into other blocks which is very apparent when the blocks get stacked to top of screen*/
+Known issues with collision:Clipping into other blocks which is very apparent when the blocks get stacked to top of screen*/
 
 function isCollision(shape, nextRow, nextCol) {
   for (let r = 0; r < shape.length; r++) {
@@ -184,19 +184,26 @@ function mergeShapeIntoGrid(shape, row, col, color) {
     }
   });
 
-  window.addEventListener('keydown', function(s){
-    if(s.code == 'KeyS'){
+window.addEventListener('keydown', function (s) {
+  if (s.code === 'KeyS') {
+    // only move down if the next row is valid
+    if (!isCollision(fallingShape, fallingShapeRow + 1, fallingShapeCol)) {
       fallingShapeRow += 1;
       update();
     }
-  });
+  }
+});
 
-   window.addEventListener('keydown', function(down){
-    if(down.code == 'ArrowDown'){
+  window.addEventListener('keydown', function (down) {
+  if (down.code === 'ArrowDown') {
+    // only move down if the next row is valid
+    if (!isCollision(fallingShape, fallingShapeRow + 1, fallingShapeCol)) {
       fallingShapeRow += 1;
       update();
     }
-  });
+  }
+});
+
 
   window.addEventListener('keydown', function(w){
     //TODO: implement this later
