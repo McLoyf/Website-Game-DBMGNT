@@ -1,5 +1,7 @@
 'use strict';
   const canvas = document.querySelector('canvas');
+  const score = document.getElementById('score');
+
   canvas.width = 620;
   canvas.height = 650;
   const g = canvas.getContext('2d');
@@ -11,6 +13,7 @@
   const colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magenta'];
   const bgColor = '#DDEEFF';
   const fallInterval = 800; // ms between downward moves
+  let scoreValue = 0; 
 
   // --- shapes ---
   const shapes = [
@@ -80,7 +83,12 @@
       drawShape(fallingShape, fallingShapeRow, fallingShapeCol, fallingShape.color);
     }
   }
-
+  function updateScore(amount){
+    scoreValue += amount;
+    if (score){
+      score.textContent = scoreValue;
+    }
+  }
   // --- fall logic ---
   function fall() {
     if (!fallingShape) return;
@@ -88,6 +96,7 @@
     if(isCollision(fallingShape, fallingShapeRow + 1, fallingShapeCol)){
       mergeShapeIntoGrid(fallingShape,fallingShapeRow, fallingShapeCol,fallingShape.color);
 
+      updateScore(10);
       spawnShape();
       update();
       return;
@@ -141,7 +150,8 @@ function mergeShapeIntoGrid(shape, row, col, color) {
   let grid = [];
   for(let r = 0; r< gridRows; r++){
     grid[r] = new Array(gridCols).fill(null);
-  }
+    }
+  
 
   function rotateShape(){
   }
@@ -190,16 +200,17 @@ function mergeShapeIntoGrid(shape, row, col, color) {
 
   window.addEventListener('keydown', function(w){
     //TODO: implement this later
-  })
+  });
 
   window.addEventListener('keydown', function(up){
     //TODO: implement this later
-  })
+  });
   // --- start game ---
   function startGame() {
     spawnShape();
     update();
     setInterval(fall, fallInterval);
+    updateScore(0);
   }
 
   startGame();

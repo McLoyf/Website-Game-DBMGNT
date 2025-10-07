@@ -78,3 +78,6 @@ a{
     position:absolute;
     bottom:5px;
 }
+.score{
+  display:flex;
+}
