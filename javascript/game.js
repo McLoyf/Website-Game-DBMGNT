@@ -88,6 +88,20 @@ function updateScore(amount) {
   if (score) {
     score.textContent = scoreValue;
   }
+
+  async function sendScoreToServer(username, score) {
+  try {
+    const res = await fetch("http://localhost:3000/api/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, score })
+    });
+    const data = await res.json();
+    console.log(data.message);
+  } catch (err) {
+    console.error("Error sending score:", err);
+  }
+}
 }
 // --- fall logic ---
 function fall() {
@@ -99,6 +113,7 @@ function fall() {
     updateScore(10);
     spawnShape();
     update();
+    sendScoreToServer("Test", scoreValue);
     return;
   }
 
@@ -133,6 +148,10 @@ function isCollision(shape, nextRow, nextCol) {
   }
   return false;
 }
+
+//**TODO: Add game over state. A way to do it is to simply write a gameover function that ends the game 
+// and have the function be called when drawing a new shape. If the shape is going to be spawned in an invalid
+// grid placement (like in the eventListeners) then set gameover to true and end game*/
 
 function mergeShapeIntoGrid(shape, row, col, color) {
   for (let r = 0; r < shape.length; r++) {
@@ -211,12 +230,21 @@ window.addEventListener('keydown', function (down) {
 
 
 window.addEventListener('keydown', function (w) {
-  //TODO: implement this later
+  if(w.code === 'KeyW'){
+    if(!isCollision(fallingShape, fallingShapeRow+1,fallinfShapeCol+1)){
+      //TODO: implement this
+    }
+  }
 });
 
 window.addEventListener('keydown', function (up) {
-  //TODO: implement this later
+  if(w.code === 'ArrowUp'){
+    if(!isCollision(fallingShape, fallingShapeRow+1,fallinfShapeCol+1)){
+      //TODO: implement this
+    }
+  }
 });
+
 // --- start game ---
 function startGame() {
   spawnShape();
