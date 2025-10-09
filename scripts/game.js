@@ -88,20 +88,32 @@ function updateScore(amount) {
   if (score) {
     score.textContent = scoreValue;
   }
-
-  async function sendScoreToServer(username, score) {
-  try {
-    const res = await fetch("http://localhost:3000/api/score", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, score })
+}
+async function sendScoreToServer(username, score) {
+  if (result.length === 0) {
+  const createUser = "INSERT INTO user (Username, JoinDate, PasswordHash, Email) VALUES (?, NOW(), '', '')";
+  db.query(createUser, [username], (err2, insertResult) => {
+    if (err2) return res.status(500).json({ error: "User creation failed" });
+    const userId = insertResult.insertId;
+    const insertGame = "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())";
+    db.query(insertGame, [userId, score], err3 => {
+      if (err3) return res.status(500).json({ error: "Game insert failed" });
+      res.json({ message: "✅ User created and score saved!" });
     });
+  });
+  return;
+}
+  try {
+    const res = await fetch("http://localhost:5000/api/score", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, score })
+  });
     const data = await res.json();
     console.log(data.message);
   } catch (err) {
     console.error("Error sending score:", err);
   }
-}
 }
 // --- fall logic ---
 function fall() {
@@ -228,7 +240,7 @@ window.addEventListener('keydown', function (down) {
   }
 });
 
-
+/**
 window.addEventListener('keydown', function (w) {
   if(w.code === 'KeyW'){
     if(!isCollision(fallingShape, fallingShapeRow+1,fallinfShapeCol+1)){
@@ -244,7 +256,7 @@ window.addEventListener('keydown', function (up) {
     }
   }
 });
-
+*/
 // --- start game ---
 function startGame() {
   spawnShape();
