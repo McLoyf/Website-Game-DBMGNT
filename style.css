@@ -1,83 +1,61 @@
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-body {
-  background-color: #111; 
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: #111;
+  color: white;
   display: flex;
   justify-content: center;
-  align-items: flex-start; 
-  min-height: 100vh;
-  color: white;
+  align-items: center;
 }
 
 .page-content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
-  margin-top: 40px; 
+  gap: 40px;
+  position: relative;
+  min-height: 90vh;
 }
 
 canvas {
   border: 2px solid white;
   background-color: #000;
   display: block;
+  width: 500x;
+  height: auto;
+}
+
+.scoreboard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .bottom-link {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
   text-align: center;
 }
 
 .bottom-link a {
   color: white;
   text-decoration: none;
-  margin: 0 12px;
+  margin: 0 15px;
   font-size: 18px;
+  transition: color 0.2s ease;
 }
 
 .bottom-link a:hover {
+  color: #0ff;
   text-decoration: underline;
-}
-.wrapper{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    margin : 0;
-}
-.wrapper h1{
-    font-size:36px;
-    text-align :center;
-}
-.button{
-    height:25px;
-    width:100%;
-
-}
-.wrapper .input-box{
-    margin:13px;
-}
-.input-box input{
-    width:30em;
-    height:33px;
-    align-content: center;
-    border-radius: 40px;
-}
-a{
-    text-decoration: none;
-    color:lightblue;
-}
-.remember-forgot a:hover{
-    text-decoration: underline;
-}
-.bottom-link-reg{
-    position:absolute;
-    bottom:5px;
-}
-.score{
-  display:flex;
 }

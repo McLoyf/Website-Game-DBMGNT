@@ -12,7 +12,7 @@ const leftMargin = 20;
 const topMargin = 50;
 const colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magenta'];
 const bgColor = '#DDEEFF';
-const fallInterval = 750; // ms between downward moves
+const fallInterval = 700; // ms between downward moves
 let scoreValue = 0;
 
 // --- shapes ---
