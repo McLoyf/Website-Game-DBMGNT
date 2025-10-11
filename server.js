@@ -6,18 +6,21 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// ✅ Port auto-detected by Railway, fallback for local dev
-const PORT = process.env.PORT || 5000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// ✅ Middleware
+// --- Middleware ---
 app.use(cors({
-  origin: ["https://mcloyf.github.io"], // ✅ allow only your GitHub Pages domain
+  origin: ["https://mcloyf.github.io"], // ✅ your GitHub Pages domain
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"]
 }));
 app.use(bodyParser.json());
+app.use(express.static(__dirname));
 
+// --- MySQL Pool ---
 const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
@@ -29,30 +32,29 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-console.log("✅ MySQL pool created");
+// --- Test connection once ---
+try {
+  const conn = await pool.getConnection();
+  console.log("✅ MySQL pool connected");
+  conn.release();
+} catch (err) {
+  console.error("❌ MySQL connection error:", err);
+}
 
-pool.connect(err => {
-  if (err) {
-    console.error("❌ MySQL connection error:", err);
-  } else {
-    console.log("✅ MySQL Connected");
-  }
-});
-
-// ✅ API: Add a new game score
+// --- API endpoint ---
 app.post("/api/score", async (req, res) => {
   try {
     const { username, score } = req.body;
-    const [rows] = await pool.query(
-      "SELECT UserID FROM user WHERE Username = ?",
-      [username]
-    );
 
+    // 1. Find user
+    const [rows] = await pool.query("SELECT UserID FROM user WHERE Username = ?", [username]);
     if (rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
     const userId = rows[0].UserID;
+
+    // 2. Insert score
     await pool.query(
       "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())",
       [userId, score]
@@ -65,48 +67,12 @@ app.post("/api/score", async (req, res) => {
   }
 });
 
-
-// ✅ Helper: save the game session
-function saveGame(userId, score, res) {
-  const insertGame =
-    "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())";
-
-  pool.query(insertGame, [userId, score], err => {
-    if (err) {
-      console.error("❌ Game insert failed:", err);
-      return res.status(500).json({ error: "Game insert failed" });
-    }
-    res.json({ message: "✅ Score saved!" });
-  });
-}
-
-// ✅ API: Get top 10 scores
-app.get("/api/scores", (req, res) => {
-  const sql = `
-    SELECT u.Username, g.FinalScore, g.DatePlayed
-    FROM gamesession g
-    JOIN user u ON g.UserID = u.UserID
-    ORDER BY g.FinalScore DESC
-    LIMIT 10
-  `;
-  pool.query(sql, (err, results) => {
-    if (err) {
-      console.error("❌ Fetch failed:", err);
-      return res.status(500).json({ error: "Database fetch failed" });
-    }
-    res.json(results);
-  });
-});
-
-// ✅ Serve index.html locally (optional)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(__dirname));
+// --- Serve index.html for root ---
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// ✅ Start the server
+// --- Start server ---
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
