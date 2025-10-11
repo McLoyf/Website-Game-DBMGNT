@@ -6,59 +6,82 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const app = express();
+
+// ✅ Port auto-detected by Railway, fallback for local dev
 const PORT = process.env.PORT || 5000;
 
-// middleware
+// ✅ Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// MySQL connection
+// ✅ MySQL Connection (uses Railway env vars if present)
 const db = mysql.createConnection({
   host: process.env.MYSQLHOST || "localhost",
   user: process.env.MYSQLUSER || "root",
-  password: process.env.MYSQLPASSWORD || "",
+  password: process.env.MYSQLPASSWORD || "password",
   database: process.env.MYSQLDATABASE || "web_game",
-  port: process.env.MYSQLPORT || 3306
+  port: process.env.MYSQLPORT || 3306,
 });
 
 db.connect(err => {
-  if (err) console.error("❌ MySQL connection error:", err);
-  else console.log("✅ MySQL Connected");
+  if (err) {
+    console.error("❌ MySQL connection error:", err);
+  } else {
+    console.log("✅ MySQL Connected");
+  }
 });
 
-// --- API ROUTES COME FIRST ---
+// ✅ API: Add a new game score
 app.post("/api/score", (req, res) => {
   const { username, score } = req.body;
+
   if (!username || !score) {
     return res.status(400).json({ error: "Missing username or score" });
   }
 
-  // find user ID
+  // Step 1: find user by username
   const findUser = "SELECT UserID FROM user WHERE Username = ?";
   db.query(findUser, [username], (err, result) => {
     if (err) {
-      console.error("Find user error:", err);
+      console.error("❌ Database error:", err);
       return res.status(500).json({ error: "Database error" });
     }
 
+    // Step 2: auto-create user if not found
     if (result.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      const createUser =
+        "INSERT INTO user (Username, JoinDate, PasswordHash, Email) VALUES (?, NOW(), '', '')";
+      db.query(createUser, [username], (err2, insertResult) => {
+        if (err2) {
+          console.error("❌ User creation failed:", err2);
+          return res.status(500).json({ error: "User creation failed" });
+        }
+
+        const newUserId = insertResult.insertId;
+        saveGame(newUserId, score, res);
+      });
+    } else {
+      const userId = result[0].UserID;
+      saveGame(userId, score, res);
     }
-
-    const userId = result[0].UserID;
-    const insert =
-      "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())";
-
-    db.query(insert, [userId, score], err2 => {
-      if (err2) {
-        console.error("Insert error:", err2);
-        return res.status(500).json({ error: "Insert failed" });
-      }
-      res.json({ message: "✅ Score saved!" });
-    });
   });
 });
 
+// ✅ Helper: save the game session
+function saveGame(userId, score, res) {
+  const insertGame =
+    "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())";
+
+  db.query(insertGame, [userId, score], err => {
+    if (err) {
+      console.error("❌ Game insert failed:", err);
+      return res.status(500).json({ error: "Game insert failed" });
+    }
+    res.json({ message: "✅ Score saved!" });
+  });
+}
+
+// ✅ API: Get top 10 scores
 app.get("/api/scores", (req, res) => {
   const sql = `
     SELECT u.Username, g.FinalScore, g.DatePlayed
@@ -68,22 +91,23 @@ app.get("/api/scores", (req, res) => {
     LIMIT 10
   `;
   db.query(sql, (err, results) => {
-    if (err) return res.status(500).json({ error: "Database fetch failed" });
+    if (err) {
+      console.error("❌ Fetch failed:", err);
+      return res.status(500).json({ error: "Database fetch failed" });
+    }
     res.json(results);
   });
 });
 
-// --- STATIC FILES AFTER API ROUTES ---
+// ✅ Serve index.html locally (optional)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(__dirname));
-
-// fallback route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// start server
+// ✅ Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

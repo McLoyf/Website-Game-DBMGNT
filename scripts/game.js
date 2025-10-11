@@ -1,6 +1,7 @@
 'use strict';
 const canvas = document.querySelector('canvas');
 const score = document.getElementById('score');
+const BACKEND_URL = "https://website-game-dbmgnt-production.up.railway.app";
 
 canvas.width = 620;
 canvas.height = 650;
@@ -89,32 +90,21 @@ function updateScore(amount) {
     score.textContent = scoreValue;
   }
 }
+
 async function sendScoreToServer(username, score) {
-  if (result.length === 0) {
-  const createUser = "INSERT INTO user (Username, JoinDate, PasswordHash, Email) VALUES (?, NOW(), '', '')";
-  db.query(createUser, [username], (err2, insertResult) => {
-    if (err2) return res.status(500).json({ error: "User creation failed" });
-    const userId = insertResult.insertId;
-    const insertGame = "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())";
-    db.query(insertGame, [userId, score], err3 => {
-      if (err3) return res.status(500).json({ error: "Game insert failed" });
-      res.json({ message: "✅ User created and score saved!" });
-    });
-  });
-  return;
-}
   try {
-    const res = await fetch("http://localhost:5000/api/score", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, score })
-  });
+    const res = await fetch(`${BACKEND_URL}/api/score`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, score })
+    });
     const data = await res.json();
     console.log(data.message);
   } catch (err) {
     console.error("Error sending score:", err);
   }
 }
+
 // --- fall logic ---
 function fall() {
   if (!fallingShape) return;
