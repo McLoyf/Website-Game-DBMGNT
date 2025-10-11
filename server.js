@@ -10,14 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const res = await fetch(
-  "https://website-game-dbmgnt-production.up.railway.app/api/score",
-  {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, score })
-  }
-);
+
 
 // --- Middleware ---
 app.use(cors({
