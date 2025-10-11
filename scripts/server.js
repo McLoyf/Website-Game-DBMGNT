@@ -14,10 +14,11 @@ app.use(bodyParser.json());
 
 // MySQL connection
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "password", // <-- your MySQL root password
-  database: "web_game"
+  host: process.env.MYSQLHOST || "localhost",
+  user: process.env.MYSQLUSER || "root",
+  password: process.env.MYSQLPASSWORD || "",
+  database: process.env.MYSQLDATABASE || "web_game",
+  port: process.env.MYSQLPORT || 3306
 });
 
 db.connect(err => {
