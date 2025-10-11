@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import mysql from "mysql2/promise";
 
 const app = express();
 
@@ -14,14 +15,18 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ MySQL Connection (uses Railway env vars if present)
-const db = mysql.createConnection({
+const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
   password: process.env.MYSQLPASSWORD,
   database: process.env.MYSQLDATABASE || "railway",
-  port: process.env.MYSQLPORT || 3306
+  port: process.env.MYSQLPORT || 3306,
+  waitForConnections: true,
+  connectionLimit: 5,
+  queueLimit: 0
 });
+
+console.log("✅ MySQL pool created");
 
 db.connect(err => {
   if (err) {
@@ -32,40 +37,31 @@ db.connect(err => {
 });
 
 // ✅ API: Add a new game score
-app.post("/api/score", (req, res) => {
-  const { username, score } = req.body;
+app.post("/api/score", async (req, res) => {
+  try {
+    const { username, score } = req.body;
+    const [rows] = await pool.query(
+      "SELECT UserID FROM user WHERE Username = ?",
+      [username]
+    );
 
-  if (!username || !score) {
-    return res.status(400).json({ error: "Missing username or score" });
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userId = rows[0].UserID;
+    await pool.query(
+      "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())",
+      [userId, score]
+    );
+
+    res.json({ message: "✅ Score saved!" });
+  } catch (err) {
+    console.error("❌ Database error:", err);
+    res.status(500).json({ error: "Database insert failed" });
   }
-
-  // Step 1: find user by username
-  const findUser = "SELECT UserID FROM user WHERE Username = ?";
-  db.query(findUser, [username], (err, result) => {
-    if (err) {
-      console.error("❌ Database error:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-
-    // Step 2: auto-create user if not found
-    if (result.length === 0) {
-      const createUser =
-        "INSERT INTO user (Username, JoinDate, PasswordHash, Email) VALUES (?, NOW(), '', '')";
-      db.query(createUser, [username], (err2, insertResult) => {
-        if (err2) {
-          console.error("❌ User creation failed:", err2);
-          return res.status(500).json({ error: "User creation failed" });
-        }
-
-        const newUserId = insertResult.insertId;
-        saveGame(newUserId, score, res);
-      });
-    } else {
-      const userId = result[0].UserID;
-      saveGame(userId, score, res);
-    }
-  });
 });
+
 
 // ✅ Helper: save the game session
 function saveGame(userId, score, res) {
