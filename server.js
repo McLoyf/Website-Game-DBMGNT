@@ -10,6 +10,14 @@ const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const res = await fetch(
+  "https://website-game-dbmgnt-production.up.railway.app/api/score",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, score })
+  }
+);
 
 // --- Middleware ---
 app.use(cors({
@@ -19,6 +27,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
+app.options("*", cors());
 
 // --- MySQL Pool ---
 const pool = mysql.createPool({
@@ -68,10 +77,10 @@ app.post("/api/score", async (req, res) => {
 });
 
 // --- Serve index.html for root ---
+app.use(express.static(__dirname));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
-
 // --- Start server ---
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
