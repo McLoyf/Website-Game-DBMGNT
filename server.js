@@ -31,7 +31,7 @@ const pool = mysql.createPool({
 
 console.log("✅ MySQL pool created");
 
-db.connect(err => {
+pool.connect(err => {
   if (err) {
     console.error("❌ MySQL connection error:", err);
   } else {
@@ -71,7 +71,7 @@ function saveGame(userId, score, res) {
   const insertGame =
     "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())";
 
-  db.query(insertGame, [userId, score], err => {
+  pool.query(insertGame, [userId, score], err => {
     if (err) {
       console.error("❌ Game insert failed:", err);
       return res.status(500).json({ error: "Game insert failed" });
@@ -89,7 +89,7 @@ app.get("/api/scores", (req, res) => {
     ORDER BY g.FinalScore DESC
     LIMIT 10
   `;
-  db.query(sql, (err, results) => {
+  pool.query(sql, (err, results) => {
     if (err) {
       console.error("❌ Fetch failed:", err);
       return res.status(500).json({ error: "Database fetch failed" });
