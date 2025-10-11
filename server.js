@@ -19,7 +19,7 @@ const db = mysql.createConnection({
   host: process.env.MYSQLHOST || "localhost",
   user: process.env.MYSQLUSER || "root",
   password: process.env.MYSQLPASSWORD || "password",
-  database: process.env.MYSQLDATABASE || "web_game",
+  database: process.env.MYSQLDATABASE || "railway",
   port: process.env.MYSQLPORT || 3306,
 });
 
