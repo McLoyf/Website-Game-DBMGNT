@@ -21,9 +21,18 @@ const res = await fetch(
 
 // --- Middleware ---
 app.use(cors({
-  origin: ["https://mcloyf.github.io"], // ✅ your GitHub Pages domain
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"]
+  origin: ["https://mcloyf.github.io"],
+  methods: ["GET", "POST", "OPTIONS"], // include OPTIONS
+  allowedHeaders: ["Content-Type"],
+  credentials: true
+}));
+
+// ✅ Step 2: Explicitly handle preflight requests
+app.options("*", cors({
+  origin: ["https://mcloyf.github.io"],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+  credentials: true
 }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
