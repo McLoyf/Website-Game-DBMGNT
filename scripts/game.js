@@ -93,11 +93,15 @@ function updateScore(amount) {
 
 async function sendScoreToServer(username, score) {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/score`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, score })
-    });
+    const res = await fetch(
+      "https://website-game-dbmgnt-production.up.railway.app/api/score", // ✅ absolute path
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, score })
+      }
+    );
+
     const data = await res.json();
     console.log(data.message);
   } catch (err) {
