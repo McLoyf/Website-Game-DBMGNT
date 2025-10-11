@@ -16,11 +16,11 @@ app.use(bodyParser.json());
 
 // ✅ MySQL Connection (uses Railway env vars if present)
 const db = mysql.createConnection({
-  host: process.env.MYSQLHOST || "localhost",
-  user: process.env.MYSQLUSER || "root",
-  password: process.env.MYSQLPASSWORD || "password",
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
   database: process.env.MYSQLDATABASE || "railway",
-  port: process.env.MYSQLPORT || 3306,
+  port: process.env.MYSQLPORT
 });
 
 db.connect(err => {
