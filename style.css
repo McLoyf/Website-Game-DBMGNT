@@ -29,7 +29,7 @@ canvas {
   border: 2px solid white;
   background-color: #000;
   display: block;
-  width: 500x;
+  width: 70%;
   height: auto;
 }
 
@@ -38,6 +38,7 @@ canvas {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  width:30%;
 }
 
 .bottom-link {
