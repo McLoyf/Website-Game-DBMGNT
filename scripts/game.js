@@ -15,24 +15,26 @@ const colors = ['green', 'red', 'blue', 'purple', 'orange', 'blueviolet', 'magen
 const bgColor = '#DDEEFF';
 const fallInterval = 700; // ms between downward moves
 let scoreValue = 0;
+let gameOver = false;
+let fallTimer = null;
 
 // --- shapes ---
 const shapes = [
-  { matrix: [[0, 1, 0], [1, 1, 1]], color: colors[2] }, // T
-  { matrix: [[1, 1], [1, 1]], color: colors[4] },     // O
-  { matrix: [[1], [1], [1], [1]], color: colors[5] }, // I
-  { matrix: [[0, 1, 1], [1, 1, 0]], color: colors[1] }, // S
-  { matrix: [[1, 1, 0], [0, 1, 1]], color: colors[0] }, // Z
-  { matrix: [[1, 0, 0], [1, 0, 0], [1, 1, 0]], color: colors[3] }, // L
-  { matrix: [[0, 1], [0, 1], [1, 1]], color: colors[6] }        // J
+  { matrix: [[0, 1, 0], [1, 1, 1]], color: colors[2] }, // T, color blue
+  { matrix: [[1, 1], [1, 1]], color: colors[4] },     // O, color orange
+  { matrix: [[1], [1], [1], [1]], color: colors[5] }, // I, blueviolet
+  { matrix: [[0, 1, 1], [1, 1, 0]], color: colors[1] }, // S, red
+  { matrix: [[1, 1, 0], [0, 1, 1]], color: colors[0] }, // Z, green
+  { matrix: [[1, 0, 0], [1, 0, 0], [1, 1, 0]], color: colors[3] }, // L, purple
+  { matrix: [[0, 1], [0, 1], [1, 1]], color: colors[6] }        // J, magenta
 ];
 
 // --- current falling piece ---
 let fallingShape = null;
 let fallingShapeRow = 0;
-let fallingShapeCol = 4;
 let gridRows = Math.floor((canvas.height - topMargin) / blockSize);
 let gridCols = Math.floor((canvas.width - leftMargin) / blockSize);
+let fallingShapeCol = gridCols/2;
 
 // --- draw one block ---
 function drawBlock(x, y, color) {
@@ -67,6 +69,12 @@ function spawnShape() {
   fallingShapeRow = 0;
   fallingShapeCol = Math.floor(gridCols / 2) - 2;
   fallingShape.color = next.color;
+
+  //  Check if spawning here is immediately invalid — means game over
+  if (isCollision(fallingShape, fallingShapeRow, fallingShapeCol)) {
+    gameOver = true;
+    endGame();
+  }
 }
 
 // --- draw current game state ---
@@ -119,7 +127,6 @@ function fall() {
     updateScore(10);
     spawnShape();
     update();
-    sendScoreToServer("Test", scoreValue);
     return;
   }
 
@@ -155,9 +162,19 @@ function isCollision(shape, nextRow, nextCol) {
   return false;
 }
 
-//**TODO: Add game over state. A way to do it is to simply write a gameover function that ends the game 
-// and have the function be called when drawing a new shape. If the shape is going to be spawned in an invalid
-// grid placement (like in the eventListeners) then set gameover to true and end game*/
+
+async function endGame() {
+  console.log("GAME OVER");
+
+  clearInterval(fallTimer); // stop movement  
+  fallingShape = null;      // prevent drawing a stuck piece
+
+  await sendScoreToServer("Test", scoreValue);
+
+  g.fillStyle = "black";
+  g.font = "40px Segoe UI";
+  g.fillText("GAME OVER", canvas.width / 2 - 120, canvas.height / 2);
+}
 
 function mergeShapeIntoGrid(shape, row, col, color) {
   for (let r = 0; r < shape.length; r++) {
@@ -255,7 +272,7 @@ window.addEventListener('keydown', function (up) {
 function startGame() {
   spawnShape();
   update();
-  setInterval(fall, fallInterval);
+  fallTimer = setInterval(fall, fallInterval);
   updateScore(0);
 }
 

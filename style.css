@@ -13,6 +13,12 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-image: url('./media/back.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100%;
+  width: 100%;
 }
 
 .page-content {
@@ -60,3 +66,69 @@ canvas {
   color: #0ff;
   text-decoration: underline;
 }
+input {
+  width: 17em;
+  padding: 12px;
+  margin: 0.7em;
+  box-sizing: border-box;
+  border: 1px solid white;
+  border-radius: 1rem;
+}
+
+button {
+  border-radius: 1em;
+  height: 2.3em;
+  width: 8em;
+  align-items: center;
+  justify-content: center;
+}
+
+button:hover{
+  border: 2px solid white;
+  background-color: black;
+  color: white;
+}
+
+button:active{
+  border: 2px solid black;
+  background-color: white;
+  color: black;
+}
+
+.links{
+  display:flex;
+  flex-wrap: wrap;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid black;
+  justify-self: center;
+  align-content: center;
+  padding: 3em;
+  border-radius: 2em;
+}
+
+.wrapper{
+  display:flex;
+  flex-wrap: wrap;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid black;
+  justify-self: center;
+  align-content: center;
+  padding: 7%;
+  border-radius: 2em;
+}
+
+.forgot{
+  display: flex;
+  margin: 1em;
+  justify-self: center;
+}
+
+h1, button, #output{
+  display: flex;
+  justify-self: center;
+}
+
+#output{
+  margin-top: 1em;
+}
+
