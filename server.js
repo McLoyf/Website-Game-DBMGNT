@@ -51,7 +51,7 @@ console.log("Connecting to MySQL…");
 app.post("/api/score", async (req, res) => {
   try {
     const { username, score } = req.body;
-    if (!username || !score) {
+    if (!username || score === undefined || score === null) {
       return res.status(400).json({ error: "Missing username or score" });
     }
 
