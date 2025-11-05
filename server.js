@@ -79,9 +79,23 @@ app.post("/api/score", async (req, res) => {
   }
 });
 
-app.get("/api/scores", async(req,res) => {
+app.get("/api/scores", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT u.Username, g.FinalScore, g.DatePlayed
+       FROM gamesession g
+       INNER JOIN user u ON g.UserID = u.UserID
+       ORDER BY g.FinalScore DESC
+       LIMIT 50`
+    );
 
-})
+    res.json(rows);
+  } catch (err) {
+    console.error("CRASH IN /api/scores:", err);
+    res.status(500).json({ error: "Failed to retrieve scores" });
+  }
+});
+
 
 app.get("/", (req, res) => {
   res.send("API running! Try POST /api/score");
