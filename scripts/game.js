@@ -54,53 +54,51 @@ var fastDown = false;
 
 var grid = [];
 var scoreboard = new Scoreboard();
-localStorage.setItem("username", "alex");
 
 
-// A / ArrowLeft→ move left
-window.addEventListener("keydown", function (e) {
- if (scoreboard.isGameOver()) return;
- if (e.code === "KeyA" || e.code === "ArrowLeft") {
-if (canMove(fallingShape, left)) {
-move(left);
-draw();
-}
- }
+// A key OR ArrowLeft → move left one cell
+window.addEventListener('keydown', function (e) {
+    if (scoreboard.isGameOver()) return;
+    if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+        if (canMove(fallingShape, left)) {
+            move(left);
+            draw();
+        }
+    }
 });
 
-// D / ArrowRight → move right
-window.addEventListener("keydown", function (e) {
- if (scoreboard.isGameOver()) return;
- if (e.code === "KeyD" || e.code === "ArrowRight") {
-if (canMove(fallingShape, right)) {
-move(right);
-draw();
-}
- }
+// D key OR ArrowRight → move right one cell
+window.addEventListener('keydown', function (e) {
+    if (scoreboard.isGameOver()) return;
+    if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+        if (canMove(fallingShape, right)) {
+            move(right);
+            draw();
+        }
+    }
 });
 
-// S / ArrowDown → move down one
-window.addEventListener("keydown", function (e) {
- if (scoreboard.isGameOver()) return;
- if (e.code === "KeyS" || e.code === "ArrowDown") {
-if (canMove(fallingShape, down)) {
-move(down);
-draw();
-}
- }
+// S key OR ArrowDown → move down one cell (no hard drop)
+window.addEventListener('keydown', function (e) {
+    if (scoreboard.isGameOver()) return;
+    if (e.code === 'KeyS' || e.code === 'ArrowDown') {
+        if (canMove(fallingShape, down)) {
+            move(down);
+            draw();
+        }
+    }
 });
 
-// W / ArrowUp → rotate piece
-window.addEventListener("keydown", function (e) {
- if (scoreboard.isGameOver()) return;
- if (e.code === "KeyW" || e.code === "ArrowUp") {
-if (canRotate(fallingShape)) {
-rotate(fallingShape);
-draw();
-}
- }
+// W key OR ArrowUp → rotate
+window.addEventListener('keydown', function (e) {
+    if (scoreboard.isGameOver()) return;
+    if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+        if (canRotate(fallingShape)) {
+            rotate(fallingShape);
+            draw();
+        }
+    }
 });
-
 
 
 addEventListener('click', function () {
@@ -114,34 +112,34 @@ fastDown = false;
 
 function canRotate(s) {
 if (s === Shapes.Square)
- return false;
+return false;
 
 var pos = new Array(4);
 for (var i = 0; i < pos.length; i++) {
- pos[i] = s.pos[i].slice();
+pos[i] = s.pos[i].slice();
 }
 
 pos.forEach(function (row) {
- var tmp = row[0];
- row[0] = row[1];
- row[1] = -tmp;
+var tmp = row[0];
+row[0] = row[1];
+row[1] = -tmp;
 });
 
 return pos.every(function (p) {
- var newCol = fallingShapeCol + p[0];
- var newRow = fallingShapeRow + p[1];
- return grid[newRow][newCol] === EMPTY;
+var newCol = fallingShapeCol + p[0];
+var newRow = fallingShapeRow + p[1];
+return grid[newRow][newCol] === EMPTY;
 });
 }
 
 function rotate(s) {
 if (s === Shapes.Square)
- return;
+return;
 
 s.pos.forEach(function (row) {
- var tmp = row[0];
- row[0] = row[1];
- row[1] = -tmp;
+var tmp = row[0];
+row[0] = row[1];
+row[1] = -tmp;
 });
 }
 
@@ -152,55 +150,56 @@ fallingShapeCol += dir.x;
 
 function canMove(s, dir) {
 return s.pos.every(function (p) {
- var newCol = fallingShapeCol + dir.x + p[0];
- var newRow = fallingShapeRow + dir.y + p[1];
- return grid[newRow][newCol] === EMPTY;
+var newCol = fallingShapeCol + dir.x + p[0];
+var newRow = fallingShapeRow + dir.y + p[1];
+return grid[newRow][newCol] === EMPTY;
 });
 }
 
 function shapeHasLanded() {
-  addShape(fallingShape);
+    addShape(fallingShape);
+    if (fallingShapeRow < 2) {
+        scoreboard.setGameOver();
+        scoreboard.setTopscore();
 
-  if (fallingShapeRow < 2) {
-    scoreboard.setGameOver();
-    scoreboard.setTopscore();
+        // ✅ send score once when the game ends
+        sendScoreToServer();
 
-    sendScoreToServer();   // ✅ post score when game over
-    return;                // ✅ don't spawn another shape
-}
-
-  scoreboard.addLines(removeLines());
-  selectShape();
+        return; // ✅ do NOT spawn a new piece after game over
+    } else {
+        scoreboard.addLines(removeLines());
+    }
+    selectShape();
 }
 
 function removeLines() {
 var count = 0;
 for (var r = 0; r < nRows - 1; r++) {
- for (var c = 1; c < nCols - 1; c++) {
+for (var c = 1; c < nCols - 1; c++) {
 if (grid[r][c] === EMPTY)
 break;
 if (c === nCols - 2) {
 count++;
 removeLine(r);
 }
- }
+}
 }
 return count;
 }
 
 function removeLine(line) {
 for (var c = 0; c < nCols; c++)
- grid[line][c] = EMPTY;
+grid[line][c] = EMPTY;
 
 for (var c = 0; c < nCols; c++) {
- for (var r = line; r > 0; r--)
+for (var r = line; r > 0; r--)
 grid[r][c] = grid[r - 1][c];
 }
 }
 
 function addShape(s) {
 s.pos.forEach(function (p) {
- grid[fallingShapeRow + p[1]][fallingShapeCol + p[0]] = s.ordinal;
+grid[fallingShapeRow + p[1]][fallingShapeCol + p[0]] = s.ordinal;
 });
 }
 
@@ -230,22 +229,19 @@ return new Shape(shape, ord);
 Shape.prototype.reset = function () {
 this.pos = new Array(4);
 for (var i = 0; i < this.pos.length; i++) {
- this.pos[i] = this.shape[i].slice();
+this.pos[i] = this.shape[i].slice();
 }
 return this.pos;
 }
 
 function selectShape() {
- fallingShapeRow = 1;
- fallingShapeCol = 5;
- fallingShape = nextShape;
- nextShape = getRandomShape();
-
- scoreboard.addScore(10);// <-- NEW LINE: score +10 every new block
-
- if (fallingShape != null) {
+fallingShapeRow = 1;
+fallingShapeCol = 5;
+fallingShape = nextShape;
+nextShape = getRandomShape();
+if (fallingShape != null) {
 fallingShape.reset();
- }
+}
 }
 
 function Scoreboard() {
@@ -258,32 +254,32 @@ var topscore = 0;
 var gameOver = true;
 
 this.reset = function () {
- this.setTopscore();
- level = lines = score = 0;
- gameOver = false;
+this.setTopscore();
+level = lines = score = 0;
+gameOver = false;
 }
 
 this.setGameOver = function () {
- gameOver = true;
+gameOver = true;
 }
 
 this.isGameOver = function () {
- return gameOver;
+return gameOver;
 }
 
 this.setTopscore = function () {
- if (score > topscore) {
+if (score > topscore) {
 topscore = score;
- }
+}
 }
 
 this.getTopscore = function () {
- return topscore;
+return topscore;
 }
 
 this.getSpeed = function () {
 
- switch (level) {
+switch (level) {
 case 0: return 700;
 case 1: return 600;
 case 2: return 500;
@@ -295,16 +291,16 @@ case 7: return 200;
 case 8: return 150;
 case 9: return 100;
 default: return 100;
- }
+}
 }
 
 this.addScore = function (sc) {
- score += sc;
+score += sc;
 }
 
 this.addLines = function (line) {
 
- switch (line) {
+switch (line) {
 case 1:
 this.addScore(10);
 break;
@@ -319,31 +315,31 @@ this.addScore(40);
 break;
 default:
 return;
- }
+}
 
- lines += line;
- if (lines > 10) {
+lines += line;
+if (lines > 10) {
 this.addLevel();
- }
+}
 }
 
 this.addLevel = function () {
- lines %= 10;
- if (level < this.MAXLEVEL) {
+lines %= 10;
+if (level < this.MAXLEVEL) {
 level++;
- }
+}
 }
 
 this.getLevel = function () {
- return level;
+return level;
 }
 
 this.getLines = function () {
- return lines;
+return lines;
 }
 
 this.getScore = function () {
- return score;
+return score;
 }
 }
 
@@ -353,9 +349,9 @@ g.clearRect(0, 0, canvas.width, canvas.height);
 drawUI();
 
 if (scoreboard.isGameOver()) {
- drawStartScreen();
+drawStartScreen();
 } else {
- drawFallingShape();
+drawFallingShape();
 }
 }
 
@@ -400,11 +396,11 @@ fillRect(gridRect, gridColor);
 
 // the blocks dropped in the grid
 for (var r = 0; r < nRows; r++) {
- for (var c = 0; c < nCols; c++) {
+for (var c = 0; c < nCols; c++) {
 var idx = grid[r][c];
 if (idx > EMPTY)
 drawSquare(idx, r, c);
- }
+}
 }
 
 // the borders of grid and preview panel
@@ -416,7 +412,7 @@ drawRect(outerRect, gridBorderColor);
 // scoreboard
 g.fillStyle = textColor;
 g.font = smallFont;
-g.fillText('hiscore ' + scoreboard.getTopscore(), scoreX, scoreY);
+g.fillText('hiscore' + scoreboard.getTopscore(), scoreX, scoreY);
 g.fillText('level' + scoreboard.getLevel(), scoreX, scoreY + 30);
 g.fillText('lines' + scoreboard.getLines(), scoreX, scoreY + 60);
 g.fillText('score' + scoreboard.getScore(), scoreX, scoreY + 90);
@@ -424,17 +420,17 @@ g.fillText('score' + scoreboard.getScore(), scoreX, scoreY + 90);
 // preview
 var minX = 5, minY = 5, maxX = 0, maxY = 0;
 nextShape.pos.forEach(function (p) {
- minX = Math.min(minX, p[0]);
- minY = Math.min(minY, p[1]);
- maxX = Math.max(maxX, p[0]);
- maxY = Math.max(maxY, p[1]);
+minX = Math.min(minX, p[0]);
+minY = Math.min(minY, p[1]);
+maxX = Math.max(maxX, p[0]);
+maxY = Math.max(maxY, p[1]);
 });
 var cx = previewCenterX - ((minX + maxX + 1) / 2.0 * blockSize);
 var cy = previewCenterY - ((minY + maxY + 1) / 2.0 * blockSize);
 
 g.translate(cx, cy);
 nextShape.shape.forEach(function (p) {
- drawSquare(nextShape.ordinal, p[1], p[0]);
+drawSquare(nextShape.ordinal, p[1], p[0]);
 });
 g.translate(-cx, -cy);
 }
@@ -442,13 +438,13 @@ g.translate(-cx, -cy);
 function drawFallingShape() {
 var idx = fallingShape.ordinal;
 fallingShape.pos.forEach(function (p) {
- drawSquare(idx, fallingShapeRow + p[1], fallingShapeCol + p[0]);
+drawSquare(idx, fallingShapeRow + p[1], fallingShapeCol + p[0]);
 });
 }
 
  function animate(lastFrameTime) {
 var requestId = requestAnimationFrame(function () {
- animate(lastFrameTime);
+animate(lastFrameTime);
 });
 
 var time = new Date().getTime();
@@ -456,7 +452,7 @@ var delay = scoreboard.getSpeed();
 
 if (lastFrameTime + delay < time) {
 
- if (!scoreboard.isGameOver()) {
+if (!scoreboard.isGameOver()) {
 
 if (canMove(fallingShape, down)) {
 move(down);
@@ -466,9 +462,9 @@ shapeHasLanded();
 draw();
 lastFrameTime = time;
 
- } else {
+} else {
 cancelAnimationFrame(requestId);
- }
+}
 }
 }
 
@@ -481,18 +477,33 @@ animate(-1);
 
 function initGrid() {
 function fill(arr, value) {
- for (var i = 0; i < arr.length; i++) {
+for (var i = 0; i < arr.length; i++) {
 arr[i] = value;
- }
+}
 }
 for (var r = 0; r < nRows; r++) {
- grid[r] = new Array(nCols);
- fill(grid[r], EMPTY);
- for (var c = 0; c < nCols; c++) {
+grid[r] = new Array(nCols);
+fill(grid[r], EMPTY);
+for (var c = 0; c < nCols; c++) {
 if (c === 0 || c === nCols - 1 || r === nRows - 1)
 grid[r][c] = BORDER;
- }
 }
+}
+}
+
+function sendScoreToServer() {
+    // Change how you obtain the username if needed:
+    var username = localStorage.getItem('username') || 'guest';
+    var score    = scoreboard.getScore();
+
+    fetch('https://website-game-dbmgnt-production.up.railway.app/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, score: score })
+    })
+    .then(res => res.json())
+    .then(data => console.log('Score saved:', data))
+    .catch(err => console.error('Error sending score:', err));
 }
 
 function init() {
@@ -500,27 +511,5 @@ initGrid();
 selectShape();
 draw();
 }
-
-app.post("/api/score", async (req, res) => {
-  const { username, score } = req.body;
-
-  if (!username || score === undefined) {
-    return res.status(400).json({ error: "username and score required" });
-  }
-
-  try {
-    await pool.query(
-      `INSERT INTO gamesession (UserID, FinalScore)
-       VALUES ((SELECT UserID FROM user WHERE Username = ?), ?)`,
-      [username, score]
-    );
-
-    res.json({ message: "Score recorded!" });
-  } catch (err) {
-    console.error("Error in /api/score:", err);
-    res.status(500).json({ error: "Failed to store score" });
-  }
-});
-
 
 init();
