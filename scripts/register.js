@@ -1,100 +1,99 @@
-'use strict';
-
-const API_BASE = "https://website-game-dbmgnt-production.up.railway.app"; // Use your local dev server URL for testing
-
-function showOutput(message, color = "white") {
-  const output = document.getElementById("output");
-  if (output) {
-    output.textContent = message;
-    output.style.color = color;
-  }
-}
-
-async function handleRegister(e) {
-  e.preventDefault();
-
-  const usernameEl = document.getElementById("username");
-  const passwordEl = document.getElementById("password");
-  const emailEl = document.getElementById("email");
-  const firstNameEl = document.getElementById("firstName");
-  const lastNameEl = document.getElementById("lastName");
-
-  const username = usernameEl ? usernameEl.value.trim() : "";
-  const password = passwordEl ? passwordEl.value.trim() : "";
-  const email = emailEl ? emailEl.value.trim() : "";
-  const firstName = firstNameEl ? firstNameEl.value.trim() : "";
-  const lastName = lastNameEl ? lastNameEl.value.trim() : "";
-
-  if (!username || !password || !email) {
-    showOutput("Please fill in all required fields.", "red");
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_BASE}/api/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, email, firstName, lastName }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      showOutput("Registration successful! Redirecting...", "lightgreen");
-      setTimeout(() => {
-        window.location.href = "./login.html";
-      }, 1500);
-    } else {
-      showOutput(data.error || "Registration failed.", "red");
-    }
-  } catch (err) {
-    console.error(err);
-    showOutput("An error occurred during registration.", "red");
-  }
-}
-
-async function handleLogin(e) {
-  e.preventDefault();
-
-  const usernameEl = document.getElementById("username");
-  const passwordEl = document.getElementById("password");
-
-  const username = usernameEl ? usernameEl.value.trim() : "";
-  const password = passwordEl ? passwordEl.value.trim() : "";
-
-  if (!username || !password) {
-    showOutput("Enter both username and password.", "red");
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_BASE}/api/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      showOutput("Login successful! Redirecting...", "lightgreen");
-      localStorage.setItem("username", username);
-      setTimeout(() => {
-        window.location.href = "../index.html";
-      }, 1500);
-    } else {
-      showOutput(data.error || "Invalid username or password.", "red");
-    }
-  } catch (err) {
-    console.error(err);
-    showOutput("An error occurred during login.", "red");
-  }
-}
+// ----------------Register------------------
+const BACKEND_URL = "https://website-game-dbmgnt-production.up.railway.app"; 
 
 document.addEventListener("DOMContentLoaded", () => {
   const registerForm = document.getElementById("registerForm");
-  const loginForm = document.getElementById("loginForm");
+  const output = document.getElementById("output");
 
-  if (registerForm) registerForm.addEventListener("submit", handleRegister);
-  if (loginForm) loginForm.addEventListener("submit", handleLogin);
+  if (registerForm) {
+    registerForm.addEventListener("submit", handleRegister);
+  }
+
+  async function handleRegister(e) {
+    e.preventDefault();
+
+    const firstName = document.getElementById("firstName")?.value || "";
+    const lastName = document.getElementById("lastName")?.value || "";
+    const username = document.getElementById("username")?.value || "";
+    const email = document.getElementById("email")?.value || "";
+    const password = document.getElementById("password")?.value || "";
+
+    if (!firstName || !lastName || !username || !email || !password) {
+      output.textContent = "⚠️ Please fill out all fields.";
+      return;
+    }
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName, username, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        output.textContent = `❌ ${data.error || "Registration failed"}`;
+        return;
+      }
+
+      output.textContent = "✅ Registration successful! Redirecting to login...";
+      localStorage.setItem("username", username);
+
+      setTimeout(() => {
+        window.location.href = "./login.html";
+      }, 1500);
+    } catch (err) {
+      console.error("Error registering:", err);
+      output.textContent = "❌ Server error during registration.";
+    }
+  }
+});
+
+// ---------Login---------
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.getElementById("loginForm");
+  const output = document.getElementById("output");
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", handleLogin);
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("username")?.value || "";
+    const password = document.getElementById("password")?.value || "";
+
+    if (!username || !password) {
+      output.textContent = "⚠️ Please enter both username and password.";
+      return;
+    }
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        output.textContent = `❌ ${data.error || "Login failed"}`;
+        return;
+      }
+
+      // Store username in localStorage for use in the game
+      localStorage.setItem("username", username);
+      output.textContent = "✅ Login successful! Redirecting...";
+
+      setTimeout(() => {
+        window.location.href = "../index.html"; // redirect to home or game page
+      }, 1500);
+    } catch (err) {
+      console.error("Error logging in:", err);
+      output.textContent = "❌ Server error during login.";
+    }
+  }
 });
