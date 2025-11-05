@@ -158,20 +158,21 @@ return grid[newRow][newCol] === EMPTY;
 
 function shapeHasLanded() {
     addShape(fallingShape);
+
     if (fallingShapeRow < 2) {
         scoreboard.setGameOver();
         scoreboard.setTopscore();
-
-        // ✅ send score once when the game ends
-        sendScoreToServer();
-
-        return; // ✅ do NOT spawn a new piece after game over
+        sendScoreToServer(); // ✅ send score on game over
+        return;
     } else {
         scoreboard.addLines(removeLines());
     }
+
+    // ✅ Add 10 points every time a new block spawns
+    scoreboard.addScore(10);
+
     selectShape();
 }
-
 function removeLines() {
 var count = 0;
 for (var r = 0; r < nRows - 1; r++) {
