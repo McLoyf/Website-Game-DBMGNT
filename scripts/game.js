@@ -492,9 +492,15 @@ grid[r][c] = BORDER;
 }
 
 function sendScoreToServer() {
-    // Change how you obtain the username if needed:
+    // Fallback username (so it’s never undefined or empty)
     var username = localStorage.getItem('username') || 'guest';
-    var score    = scoreboard.getScore();
+    var score = scoreboard.getScore();
+
+    // Ensure score is numeric and > 0
+    if (!username || isNaN(score)) {
+        console.warn("Invalid username or score:", username, score);
+        return;
+    }
 
     fetch('https://website-game-dbmgnt-production.up.railway.app/api/score', {
         method: 'POST',
@@ -505,6 +511,7 @@ function sendScoreToServer() {
     .then(data => console.log('Score saved:', data))
     .catch(err => console.error('Error sending score:', err));
 }
+
 
 function init() {
 initGrid();
