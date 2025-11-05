@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Tetris — Leaderboard</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="../style.css">
   <style>
     :root{font-family: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0}
     body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0b1220;color:#e6eef8}
@@ -90,6 +90,31 @@
     // Uncomment to test sample data on load:
     // populateLeaderboard([{player:'Player1',score:99999,level:20,lines:400,date:'2025-10-28'}]);
   </script>
+  <script>
+  async function loadLeaderboard() {
+    try {
+      const res = await fetch("https://website-game-dbmgnt-production.up.railway.app/api/scores");
+      const data = await res.json();
+
+      // Transform backend data into leaderboard-friendly format
+      const entries = data.map((row, index) => ({
+        player: row.Username || "—",
+        score: row.FinalScore || 0,
+        level: "—", // placeholder, unless you add level to DB
+        lines: "—", // placeholder
+        date: new Date(row.DatePlayed).toLocaleDateString(),
+      }));
+
+      populateLeaderboard(entries);
+    } catch (err) {
+      console.error("Error loading leaderboard:", err);
+      populateLeaderboard([]);
+    }
+  }
+
+  // Load leaderboard automatically on page load
+  window.addEventListener("DOMContentLoaded", loadLeaderboard);
+</script>
 
     <div class="bottom-link">
         <a href="../index.html">Go Back to Home</a>
