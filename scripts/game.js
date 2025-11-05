@@ -501,21 +501,26 @@ selectShape();
 draw();
 }
 
-function sendScoreToServer() {
-// CHANGE THIS to your frontend stored username (localStorage, prompt, etc.)
-const username = localStorage.getItem("username") || "guest";
+app.post("/api/score", async (req, res) => {
+  const { username, score } = req.body;
 
-fetch("https://YOUR_BACKEND_URL/api/score", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-  username: username,
-  score: scoreboard.getScore()
-})
-})
-  .then(res => res.json())
-  .then(data => console.log("Score saved:", data))
-  .catch(err => console.error("Error posting score:", err));
-}
+  if (!username || score === undefined) {
+    return res.status(400).json({ error: "username and score required" });
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO gamesession (UserID, FinalScore)
+       VALUES ((SELECT UserID FROM user WHERE Username = ?), ?)`,
+      [username, score]
+    );
+
+    res.json({ message: "Score recorded!" });
+  } catch (err) {
+    console.error("Error in /api/score:", err);
+    res.status(500).json({ error: "Failed to store score" });
+  }
+});
+
 
 init();
