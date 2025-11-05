@@ -86,7 +86,7 @@ app.get("/api/scores", async (req, res) => {
        FROM gamesession g
        INNER JOIN user u ON g.UserID = u.UserID
        ORDER BY g.FinalScore DESC
-       LIMIT 50`
+       LIMIT 25`
     );
 
     res.json(rows);
