@@ -2,17 +2,16 @@ import express from "express";
 import mysql from "mysql2/promise";
 import bodyParser from "body-parser";
 import cors from "cors";
+import bcrypt from "bcrypt";
 import path from "path";
 import { fileURLToPath } from "url";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: "https://mcloyf.github.io",
+    origin: ["http://127.0.0.1:5500", "https://mcloyf.github.io"], // adjust for your dev + prod
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
@@ -23,159 +22,152 @@ app.use(
 app.use(bodyParser.json());
 app.use(express.json());
 
+// Path setup
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(__dirname));
 
+// MySQL connection
 const pool = mysql.createPool({
-  host: process.env.MYSQLHOST,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE || "railway",
-  port: process.env.MYSQLPORT,
+  host: process.env.MYSQLHOST || "localhost",
+  user: process.env.MYSQLUSER || "root",
+  password: process.env.MYSQLPASSWORD || "",
+  database: process.env.MYSQLDATABASE || "web_game",
+  port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
 
-console.log("Connecting to MySQL…");
-
+// Verify connection
 (async () => {
   try {
-    const connection = await pool.getConnection();
-    console.log("MySQL Connected");
-    connection.release();
+    const conn = await pool.getConnection();
+    console.log("✅ MySQL Connected");
+    conn.release();
   } catch (err) {
-    console.error("MySQL connection error:", err);
+    console.error("❌ MySQL connection error:", err);
   }
 })();
 
-app.post("/api/score", async (req, res) => {
+/* ==============================
+   REGISTER
+============================== */
+app.post("/api/register", async (req, res) => {
   try {
-    const { username, score } = req.body;
-    if (!username || score === undefined || score === null) {
-      return res.status(400).json({ error: "Missing username or score" });
-    }
+    const { firstName, lastName, username, email, password } = req.body;
 
-    console.log("Looking up user:", username);
-    const [rows] = await pool.query("SELECT UserID FROM user WHERE Username = ?", [username]);
+    if (!firstName || !lastName || !username || !email || !password)
+      return res.status(400).json({ error: "Missing required fields" });
 
-    if (!rows || rows.length === 0) {
-      console.log("User not found:", username);
-      return res.status(404).json({ error: "User not found" });
-    }
+    const [existing] = await pool.query(
+      "SELECT * FROM `user` WHERE Username = ? OR Email = ?",
+      [username, email]
+    );
+    if (existing.length > 0)
+      return res.status(400).json({ error: "Username or email already taken" });
 
-    const userId = rows[0].UserID;
-    console.log("Found UserID:", userId);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
-      "INSERT INTO gamesession (UserID, FinalScore, TimePlayed, DatePlayed) VALUES (?, ?, NOW(), NOW())",
-      [userId, score]
+      "INSERT INTO `user` (FirstName, LastName, Username, PasswordHash, Email, JoinDate) VALUES (?, ?, ?, ?, ?, NOW())",
+      [firstName, lastName, username, hashedPassword, email]
     );
 
-    console.log("Score inserted successfully!");
-    res.json({ message: "Score saved!" });
+    res.json({ message: "Registration successful" });
   } catch (err) {
-    console.error("CRASH IN /api/score:", err);
-    res.status(500).json({ error: err.message });
+    console.error("❌ Error in /api/register:", err);
+    res.status(500).json({ error: "Server error during registration" });
   }
 });
 
-app.get("/api/scores", async (req, res) => {
+/* ==============================
+   LOGIN
+============================== */
+app.post("/api/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password)
+      return res.status(400).json({ error: "Missing username or password" });
+
+    const [users] = await pool.query(
+      "SELECT * FROM `user` WHERE Username = ?",
+      [username]
+    );
+    if (users.length === 0)
+      return res.status(404).json({ error: "User not found" });
+
+    const user = users[0];
+    const match = await bcrypt.compare(password, user.PasswordHash);
+    if (!match)
+      return res.status(401).json({ error: "Invalid credentials" });
+
+    res.json({ message: "Login successful", username: user.Username });
+  } catch (err) {
+    console.error("❌ Error in /api/login:", err);
+    res.status(500).json({ error: "Server error during login" });
+  }
+});
+
+/* ==============================
+   SCORE SUBMISSION
+============================== */
+app.post("/api/score", async (req, res) => {
+  try {
+    const { username, score, level = 0, lines = 0 } = req.body;
+
+    if (!username || score == null)
+      return res.status(400).json({ error: "Missing username or score" });
+
+    const [users] = await pool.query(
+      "SELECT UserID FROM `user` WHERE Username = ?",
+      [username]
+    );
+    if (users.length === 0)
+      return res.status(404).json({ error: "User not found" });
+
+    const userId = users[0].UserID;
+
+    await pool.query(
+      "INSERT INTO `gamesession` (UserID, FinalScore, LevelReached, LinesCleared, TimePlayed, DatePlayed) VALUES (?, ?, ?, ?, NOW(), NOW())",
+      [userId, score, level, lines]
+    );
+
+    res.json({ message: "Score saved!" });
+  } catch (err) {
+    console.error("❌ Error in /api/score:", err);
+    res.status(500).json({ error: "Failed to save score" });
+  }
+});
+
+/* ==============================
+   LEADERBOARD
+============================== */
+app.get("/api/leaderboard", async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT u.Username, g.FinalScore, g.DatePlayed
+      `SELECT 
+         ROW_NUMBER() OVER (ORDER BY g.FinalScore DESC) AS RankPos,
+         u.Username AS Player,
+         g.FinalScore AS Score,
+         g.LevelReached AS Level,
+         g.LinesCleared AS Lines,
+         DATE_FORMAT(g.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
        FROM gamesession g
-       INNER JOIN user u ON g.UserID = u.UserID
+       JOIN user u ON g.UserID = u.UserID
        ORDER BY g.FinalScore DESC
        LIMIT 25`
     );
 
     res.json(rows);
   } catch (err) {
-    console.error("CRASH IN /api/scores:", err);
-    res.status(500).json({ error: "Failed to retrieve scores" });
+    console.error("❌ Error in /api/leaderboard:", err);
+    res.status(500).json({ error: "Failed to retrieve leaderboard" });
   }
 });
-
 
 app.get("/", (req, res) => {
-  res.send("API running! Try POST /api/score");
+  res.send("API running — try /api/register, /api/login, /api/score, or /api/leaderboard");
 });
 
-// Register new user
-app.post("/api/register", async (req, res) => {
-  try {
-    const { username, password, email, firstName, lastName } = req.body;
-    if (!username || !password || !email) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const [exists] = await pool.query("SELECT * FROM user WHERE Username = ?", [username]);
-    if (exists.length > 0) {
-      return res.status(400).json({ error: "Username already exists" });
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    const encryptedEmail = encryptAES(email);
-
-    await pool.query(
-      "INSERT INTO user (Username, PasswordHash, Email, JoinDate) VALUES (?, ?, ?, NOW())",
-      [username, passwordHash, encryptedEmail]
-    );
-
-    res.json({ message: "User registered successfully" });
-  } catch (err) {
-    console.error("Registration error:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// Login existing user
-app.post("/api/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const [rows] = await pool.query("SELECT * FROM user WHERE Username = ?", [username]);
-
-    if (!rows || rows.length === 0)
-      return res.status(400).json({ error: "User not found" });
-
-    const user = rows[0];
-    const isMatch = await bcrypt.compare(password, user.PasswordHash);
-
-    if (!isMatch)
-      return res.status(401).json({ error: "Incorrect password" });
-
-    // Decrypt email before sending
-    const decryptedEmail = user.Email ? decryptAES(user.Email) : null;
-
-    res.json({
-      message: "Login successful",
-      user: { username: user.Username, email: decryptedEmail },
-    });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-const AES_KEY = process.env.AES_KEY; // 32 bytes
-const AES_IV = crypto.randomBytes(16);
-
-function encryptAES(text) {
-  const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(AES_KEY, "utf8"), AES_IV);
-  let encrypted = cipher.update(text, "utf8", "base64");
-  encrypted += cipher.final("base64");
-  return `${AES_IV.toString("base64")}:${encrypted}`; // store IV + ciphertext
-}
-
-function decryptAES(data) {
-  const [ivBase64, encrypted] = data.split(":");
-  const iv = Buffer.from(ivBase64, "base64");
-  const decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(AES_KEY, "utf8"), iv);
-  let decrypted = decipher.update(encrypted, "base64", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
-}
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
