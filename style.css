@@ -1,6 +1,7 @@
+/* ---------- GLOBAL RESET ---------- */
 * {
   box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
@@ -8,13 +9,14 @@
 html, body {
   height: 100%;
   width: 100%;
-  background-color: #111;
-  color: white;
+  background: #0b1220;
+  color: #e6eef8;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+/* ---------- MAIN PAGE LAYOUT ---------- */
 .page-content {
   display: flex;
   flex-direction: row;
@@ -25,6 +27,7 @@ html, body {
   min-height: 90vh;
 }
 
+/* ---------- CANVAS (TETRIS GAME) ---------- */
 canvas {
   position: absolute;
   top: 45%;
@@ -32,16 +35,20 @@ canvas {
   width: 640px;
   height: 640px;
   margin: -320px 0 0 -320px;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
 }
 
+/* ---------- SCOREBOARD / CONTAINERS ---------- */
 .scoreboard {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width:30%;
+  width: 30%;
 }
 
+/* ---------- LINK BAR AT PAGE BOTTOM ---------- */
 .bottom-link {
   position: absolute;
   bottom: 20px;
@@ -49,11 +56,11 @@ canvas {
   text-align: center;
 }
 
-.bottom-link a {
-  color: white;
+.bottom-link a, a {
+  color: #9fb0c9;
   text-decoration: none;
   margin: 0 15px;
-  font-size: 18px;
+  font-size: 16px;
   transition: color 0.2s ease;
 }
 
@@ -61,13 +68,22 @@ canvas {
   color: #0ff;
   text-decoration: underline;
 }
+
+a:hover{
+  color: #0ff;
+  text-decoration: underline;
+}
+
+/* ---------- INPUTS AND BUTTONS ---------- */
 input {
   width: 17em;
   padding: 12px;
   margin: 0.7em;
   box-sizing: border-box;
-  border: 1px solid white;
+  border: 1px solid #bcd3ea;
   border-radius: 1rem;
+  background-color: #071227;
+  color: #e6eef8;
 }
 
 button {
@@ -76,54 +92,175 @@ button {
   width: 8em;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cfe7ff;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
-button:hover{
+button:hover {
   border: 2px solid white;
-  background-color: black;
+  background-color: #0b1220;
   color: white;
 }
 
-button:active{
+button:active {
   border: 2px solid black;
   background-color: white;
   color: black;
 }
 
-.links{
-  display:flex;
+/* ---------- FLEX WRAPPERS FOR LOGIN / FORMS ---------- */
+.links,
+.wrapper {
+  display: flex;
   flex-wrap: wrap;
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 2px solid black;
+  background-color: rgba(15, 23, 36, 0.9);
+  border: 2px solid #071227;
   justify-self: center;
   align-content: center;
   padding: 3em;
-  border-radius: 2em;
+  border-radius: 1.5em;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
 }
 
-.wrapper{
-  display:flex;
-  flex-wrap: wrap;
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 2px solid black;
-  justify-self: center;
-  align-content: center;
+.wrapper {
   padding: 7%;
-  border-radius: 2em;
 }
 
-.forgot{
+.forgot {
   display: flex;
   margin: 1em;
   justify-self: center;
 }
 
-h1, button, #output{
+/* ---------- TYPOGRAPHY ---------- */
+h1, button, #output {
   display: flex;
   justify-self: center;
 }
 
-#output{
+h1 {
+  margin-bottom: 0.6em;
+  letter-spacing: 0.5px;
+}
+
+#output {
   margin-top: 1em;
 }
 
+/* ---------- LEADERBOARD CARD ---------- */
+.card {
+  width: min(900px, 95%);
+  background: linear-gradient(180deg, #0f1724 0%, #071227 100%);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+}
+
+h1.card-title {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  letter-spacing: 0.6px;
+}
+
+p.subtitle {
+  margin: 0 0 18px 0;
+  color: #9fb0c9;
+  font-size: 13px;
+}
+
+/* ---------- LEADERBOARD TABLE ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  display: block;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+thead,
+tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #bcd3ea;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+}
+
+tbody td {
+  padding: 14px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 15px;
+}
+
+tbody tr.empty td {
+  color: rgba(182, 201, 220, 0.22);
+  font-style: italic;
+}
+
+/* Table column alignment */
+.rank {
+  width: 64px;
+}
+.score {
+  width: 140px;
+  text-align: right;
+}
+.meta {
+  width: 120px;
+  color: #9fb0c9;
+  font-size: 13px;
+  text-align: right;
+}
+
+/* ---------- SMALL TEXT AND BUTTONS ---------- */
+.small {
+  font-size: 12px;
+  color: #9fb0c9;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #cfe7ff;
+  font-size: 13px;
+  cursor: not-allowed;
+}
+
+/* ---------- RESPONSIVENESS ---------- */
+@media (max-width: 768px) {
+  .card {
+    padding: 16px;
+  }
+  table {
+    max-height: 400px;
+  }
+  canvas {
+    width: 90vw;
+    height: 90vw;
+    margin: 0;
+    position: static;
+  }
+  .page-content {
+    flex-direction: column;
+  }
+}
