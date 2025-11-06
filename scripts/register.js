@@ -1,5 +1,5 @@
 // scripts/register.js
-const BACKEND_URL = "https://website-game-dbmgnt-production.up.railway.app";
+const BACKEND_URL = "website-game-dbmgnt-production.up.railway.app";
 
 document.addEventListener("DOMContentLoaded", () => {
   const registerForm = document.getElementById("registerForm");

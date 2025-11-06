@@ -93,7 +93,7 @@
   <script>
   async function loadLeaderboard() {
     try {
-      const res = await fetch("https://website-game-dbmgnt-production.up.railway.app/api/scores");
+      const res = await fetch("website-game-dbmgnt-production.up.railway.app/api/scores");
       const data = await res.json();
 
       // Transform backend data into leaderboard-friendly format
