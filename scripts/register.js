@@ -17,8 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const username = document.getElementById("username")?.value || "";
       const password = document.getElementById("password")?.value || "";
 
-      app.post("/api/register", async (req, res) => {
-  try {
+      try {
     const { firstName, lastName, email, username, password } = req.body;
     console.log("Received registration data:", req.body); // 🟢 Log the incoming payload
 
@@ -44,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
     res.status(500).json({ error: err.message });
   }
 });
-    });
   }
 
   // Handle login form
