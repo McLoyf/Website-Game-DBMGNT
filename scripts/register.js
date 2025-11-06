@@ -1,99 +1,76 @@
-// ----------------Register------------------
-const BACKEND_URL = "https://website-game-dbmgnt-production.up.railway.app"; 
+// scripts/register.js
+
+const BACKEND_URL = "https://website-game-dbmgnt-production.up.railway.app";
 
 document.addEventListener("DOMContentLoaded", () => {
   const registerForm = document.getElementById("registerForm");
-  const output = document.getElementById("output");
-
-  if (registerForm) {
-    registerForm.addEventListener("submit", handleRegister);
-  }
-
-  async function handleRegister(e) {
-    e.preventDefault();
-
-    const firstName = document.getElementById("firstName")?.value || "";
-    const lastName = document.getElementById("lastName")?.value || "";
-    const username = document.getElementById("username")?.value || "";
-    const email = document.getElementById("email")?.value || "";
-    const password = document.getElementById("password")?.value || "";
-
-    if (!firstName || !lastName || !username || !email || !password) {
-      output.textContent = "⚠️ Please fill out all fields.";
-      return;
-    }
-
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, username, email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        output.textContent = `❌ ${data.error || "Registration failed"}`;
-        return;
-      }
-
-      output.textContent = "✅ Registration successful! Redirecting to login...";
-      localStorage.setItem("username", username);
-
-      setTimeout(() => {
-        window.location.href = "./login.html";
-      }, 1500);
-    } catch (err) {
-      console.error("Error registering:", err);
-      output.textContent = "❌ Server error during registration.";
-    }
-  }
-});
-
-// ---------Login---------
-document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
-  const output = document.getElementById("output");
 
-  if (loginForm) {
-    loginForm.addEventListener("submit", handleLogin);
+  // Handle registration form
+  if (registerForm) {
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const firstName = document.getElementById("firstName")?.value || "";
+      const lastName = document.getElementById("lastName")?.value || "";
+      const email = document.getElementById("email")?.value || "";
+      const username = document.getElementById("username")?.value || "";
+      const password = document.getElementById("password")?.value || "";
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firstName, lastName, email, username, password }),
+        });
+
+        const data = await res.json();
+        const output = document.getElementById("output");
+
+        if (res.ok) {
+          output.textContent = "✅ Registration successful! You can now log in.";
+          output.style.color = "lightgreen";
+        } else {
+          output.textContent = `❌ Error: ${data.error || "Something went wrong."}`;
+          output.style.color = "red";
+        }
+      } catch (err) {
+        console.error("Registration error:", err);
+        document.getElementById("output").textContent = "❌ Connection error.";
+      }
+    });
   }
 
-  async function handleLogin(e) {
-    e.preventDefault();
+  // Handle login form
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const username = document.getElementById("username")?.value || "";
-    const password = document.getElementById("password")?.value || "";
+      const username = document.getElementById("username")?.value || "";
+      const password = document.getElementById("password")?.value || "";
 
-    if (!username || !password) {
-      output.textContent = "⚠️ Please enter both username and password.";
-      return;
-    }
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
 
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+        const data = await res.json();
+        const output = document.getElementById("output");
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        output.textContent = `❌ ${data.error || "Login failed"}`;
-        return;
+        if (res.ok) {
+          output.textContent = "✅ Login successful!";
+          output.style.color = "lightgreen";
+          // redirect or store token here if needed
+        } else {
+          output.textContent = `❌ ${data.error || "Invalid credentials."}`;
+          output.style.color = "red";
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        document.getElementById("output").textContent = "❌ Connection error.";
       }
-
-      // Store username in localStorage for use in the game
-      localStorage.setItem("username", username);
-      output.textContent = "✅ Login successful! Redirecting...";
-
-      setTimeout(() => {
-        window.location.href = "../index.html"; // redirect to home or game page
-      }, 1500);
-    } catch (err) {
-      console.error("Error logging in:", err);
-      output.textContent = "❌ Server error during login.";
-    }
+    });
   }
 });

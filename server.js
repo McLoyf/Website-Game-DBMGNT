@@ -55,29 +55,28 @@ const pool = mysql.createPool({
 ============================== */
 app.post("/api/register", async (req, res) => {
   try {
-    const { firstName, lastName, username, email, password } = req.body;
+    const { firstName, lastName, email, username, password } = req.body;
 
-    if (!firstName || !lastName || !username || !email || !password)
+    if (!username || !password || !email) {
       return res.status(400).json({ error: "Missing required fields" });
-
-    const [existing] = await pool.query(
-      "SELECT * FROM `user` WHERE Username = ? OR Email = ?",
-      [username, email]
-    );
-    if (existing.length > 0)
-      return res.status(400).json({ error: "Username or email already taken" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
-      "INSERT INTO `user` (FirstName, LastName, Username, PasswordHash, Email, JoinDate) VALUES (?, ?, ?, ?, ?, NOW())",
+      `INSERT INTO user (FirstName, LastName, Username, PasswordHash, Email, JoinDate)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
       [firstName, lastName, username, hashedPassword, email]
     );
 
-    res.json({ message: "Registration successful" });
+    res.json({ message: "User registered successfully" });
   } catch (err) {
-    console.error("❌ Error in /api/register:", err);
-    res.status(500).json({ error: "Server error during registration" });
+    console.error("Registration error:", err);
+    if (err.code === "ER_DUP_ENTRY") {
+      res.status(400).json({ error: "Username already exists" });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 });
 
@@ -87,25 +86,18 @@ app.post("/api/register", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password)
-      return res.status(400).json({ error: "Missing username or password" });
+    const [rows] = await pool.query("SELECT * FROM user WHERE Username = ?", [username]);
 
-    const [users] = await pool.query(
-      "SELECT * FROM `user` WHERE Username = ?",
-      [username]
-    );
-    if (users.length === 0)
-      return res.status(404).json({ error: "User not found" });
+    if (rows.length === 0)
+      return res.status(401).json({ error: "User not found" });
 
-    const user = users[0];
-    const match = await bcrypt.compare(password, user.PasswordHash);
-    if (!match)
-      return res.status(401).json({ error: "Invalid credentials" });
+    const valid = await bcrypt.compare(password, rows[0].PasswordHash);
+    if (!valid) return res.status(401).json({ error: "Invalid password" });
 
-    res.json({ message: "Login successful", username: user.Username });
+    res.json({ message: "Login successful", user: { username } });
   } catch (err) {
-    console.error("❌ Error in /api/login:", err);
-    res.status(500).json({ error: "Server error during login" });
+    console.error("Login error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
