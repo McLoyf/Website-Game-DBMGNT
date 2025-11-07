@@ -1,129 +1,210 @@
-* {
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* === Shared Base === */
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
   margin: 0;
-  padding: 0;
+  color-scheme: dark;
 }
 
-html, body {
-  height: 100%;
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #0b1220;
+  color: #e6eef8;
+}
+
+/* === Form Card Container === */
+.wrapper {
+  width: min(400px, 90%);
+  background: linear-gradient(180deg, #0f1724 0%, #071227 100%);
+  border-radius: 12px;
+  padding: 32px 28px;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+/* === Headings === */
+h1 {
+  font-size: 22px;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.6px;
+  color: #d5e1f5;
+}
+
+/* === Input Boxes === */
+.input-box {
   width: 100%;
-  background-color: #111;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin-bottom: 1.1rem;
 }
 
-.page-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  position: relative;
-  min-height: 90vh;
-}
-
-canvas {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  width: 640px;
-  height: 640px;
-  margin: -320px 0 0 -320px;
-}
-
-.scoreboard {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  width:30%;
-}
-
-.bottom-link {
-  position: absolute;
-  bottom: 20px;
+.input-box input {
   width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  color: #e6eef8;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.input-box input:focus {
+  outline: none;
+  border-color: #45f3ff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* === Buttons === */
+.button {
+  background: #172a45;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e6eef8;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  padding: 12px 0;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+}
+
+.button:hover {
+  background: #1b355a;
+  transform: scale(1.02);
+}
+
+.button:active {
+  background: #0ff;
+  color: #000;
+  transform: scale(0.98);
+}
+
+/* === Forgot password / Links === */
+.forgot, .bottom-link {
+  margin-top: 1.5rem;
   text-align: center;
 }
 
-.bottom-link a {
-  color: white;
+.forgot a, .bottom-link a {
+  color: #9fb0c9;
   text-decoration: none;
-  margin: 0 15px;
-  font-size: 18px;
+  font-size: 13px;
   transition: color 0.2s ease;
 }
 
-.bottom-link a:hover {
-  color: #0ff;
+.forgot a:hover, .bottom-link a:hover {
+  color: #45f3ff;
   text-decoration: underline;
 }
-input {
-  width: 17em;
-  padding: 12px;
-  margin: 0.7em;
-  box-sizing: border-box;
-  border: 1px solid white;
-  border-radius: 1rem;
+
+/* === Output messages === */
+#output {
+  margin-top: 1rem;
+  font-size: 14px;
+  color: #9fb0c9;
+  text-align: center;
 }
 
-button {
-  border-radius: 1em;
-  height: 2.3em;
-  width: 8em;
+/* === Small animations === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Tetris Index Page Enhancements === */
+
+body.index-page {
+  background: radial-gradient(circle at center, #0b1220 0%, #050a15 100%);
+  color: #e6eef8;
+  overflow: hidden;
+}
+
+/* Glow effect for the game frame */
+canvas {
+  filter: drop-shadow(0 0 25px rgba(66, 180, 255, 0.35));
+}
+
+/* Subtle glass frame around the whole Tetris board */
+.page-content {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  padding: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+/* Make the Tetris title pop */
+h1, .game-title {
+  font-family: sans-serif;
+  color: #45f3ff;
+  text-shadow: 0 0 8px rgba(69, 243, 255, 0.4);
+}
+
+/* Make "click to start" feel like a button */
+.click-to-start {
+  background: #1b355a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  color: #e6eef8;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.click-to-start:hover {
+  background: #45f3ff;
+  color: #000;
+  transform: scale(1.05);
+}
+
+.header {
+  position: absolute;
+  top: 0;                     /* stick to top */
+  left: 0;
+  width: 100%;                /* full width */
+  display: flex;
+  justify-content: center;    /* center the nav group horizontally */
   align-items: center;
-  justify-content: center;
+  padding: 2rem 0;
+  background-color: rgba(30, 30, 40, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1000;
 }
 
-button:hover{
-  border: 2px solid white;
-  background-color: black;
-  color: white;
-}
-
-button:active{
-  border: 2px solid black;
-  background-color: white;
-  color: black;
-}
-
-.links{
-  display:flex;
-  flex-wrap: wrap;
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 2px solid black;
-  justify-self: center;
-  align-content: center;
-  padding: 3em;
-  border-radius: 2em;
-}
-
-.wrapper{
-  display:flex;
-  flex-wrap: wrap;
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 2px solid black;
-  justify-self: center;
-  align-content: center;
-  padding: 7%;
-  border-radius: 2em;
-}
-
-.forgot{
+.nav {
   display: flex;
-  margin: 1em;
-  justify-self: center;
+  gap: 2rem;
 }
 
-h1, button, #output{
-  display: flex;
-  justify-self: center;
+.nav a {
+  text-decoration: none;
+  color: #e6eef8;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
-#output{
-  margin-top: 1em;
+.nav a:hover {
+  color: #45f3ff;
 }
 
+.logo img {
+  position: absolute;
+  left: 2rem;
+  top: 1rem;
+  height: 50px;
+  width: auto;
+  border-radius: 8px;
+}
+
+.bottom-link{
+  position: absolute;
+  bottom: 1em;;
+}

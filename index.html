@@ -8,14 +8,22 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
+<body class="index-page">
+<header class="header">
+  <div class="logo"><img src="./media/logo.png" alt="Tetris logo"></div>
+  <nav class="nav">
+    <a href="./pages/login.html">Login</a>
+    <a href="./pages/signup.html">Signup</a>
+    <a href="./pages/leaderboard.html">Leaderboard</a>
+  </nav>
+</header>
+
   <div class="page-content">
     <canvas id="game"></canvas>
-    <div class="bottom-link">
-      <a href="./pages/login.html">Login</a>
-      <a href="./pages/signup.html">Signup</a>
-      <a href="./pages/leaderboard.html">Leaderboard</a>
-    </div>
+  </div>
+
+  <div class="bottom-link">
+    <a href="./index.html">Back to Home</a>
   </div>
 
   <script src="./scripts/game.js" defer></script>
