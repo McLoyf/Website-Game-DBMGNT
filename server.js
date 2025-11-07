@@ -9,15 +9,12 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(
-  cors({
-    origin: ["http://127.0.0.1:5500", "https://mcloyf.github.io"], // adjust for your dev + prod
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
-    credentials: true,
-    optionsSuccessStatus: 204,
-  })
-);
+app.use(cors({
+  origin: "https://mcloyf.github.io",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+  credentials: true,
+}));
 
 app.use(bodyParser.json());
 app.use(express.json());
