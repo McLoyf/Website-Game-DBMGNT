@@ -90,19 +90,21 @@
     // Uncomment to test sample data on load:
     //populateLeaderboard([{player:'Player1',score:99999,level:20,lines:400,date:'2025-10-28'}]);
   </script>
-  <script>
+<script>
   async function loadLeaderboard() {
     try {
-      const res = await fetch("website-game-dbmgnt-production.up.railway.app/api/scores");
+      const res = await fetch("https://website-game-dbmgnt-production.up.railway.app/api/leaderboard");
       const data = await res.json();
 
       // Transform backend data into leaderboard-friendly format
-      const entries = data.map((row, index) => ({
-        player: row.Username || "—",
-        score: row.FinalScore || 0,
-        level: "—", // placeholder, unless you add level to DB
-        lines: "—", // placeholder
-        date: new Date(row.DatePlayed).toLocaleDateString(),
+      const entries = data.map((row) => ({
+        rank: row.RankPos ?? "—",
+        player: row.Player ?? "—",
+        score: row.Score ?? 0,
+        level: row.Level ?? "—",
+        lines: row.Lines ?? "—",
+        // backend already formats PlayedAt as 'YYYY-MM-DD HH:MM'
+        date: row.PlayedAt ?? "—",
       }));
 
       populateLeaderboard(entries);
@@ -115,6 +117,7 @@
   // Load leaderboard automatically on page load
   window.addEventListener("DOMContentLoaded", loadLeaderboard);
 </script>
+
 
     <div class="bottom-link">
         <a href="../index.html">Go Back to Home</a>
