@@ -9,12 +9,17 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({
-  origin: "https://mcloyf.github.io",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "https://mcloyf.github.io",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
+    optionsSuccessStatus: 204,
+  })
+);
+
+
 
 app.use(bodyParser.json());
 app.use(express.json());
@@ -28,8 +33,8 @@ app.use(express.static(__dirname));
 const pool = mysql.createPool({
   host: process.env.MYSQLHOST || "localhost",
   user: process.env.MYSQLUSER || "root",
-  password: process.env.MYSQLPASSWORD || "",
-  database: process.env.MYSQLDATABASE || "web_game",
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE || "railway",
   port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
