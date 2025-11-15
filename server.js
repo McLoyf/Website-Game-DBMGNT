@@ -136,16 +136,30 @@ app.get("/api/leaderboard", async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT 
-         ROW_NUMBER() OVER (ORDER BY g.FinalScore DESC) AS RankPos,
-         u.Username AS Player,
-         g.FinalScore AS Score,
-         g.LevelReached AS Level,
-         g.LinesCleared AS Lines,
-         DATE_FORMAT(g.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
-       FROM gamesession g
-       JOIN user u ON g.UserID = u.UserID
-       ORDER BY g.FinalScore DESC
-       LIMIT 25`
+          @rank := @rank + 1 AS RankPos,
+          t.Username AS Player,
+          t.FinalScore AS Score,
+          t.LevelReached AS Level,
+          t.LinesCleared AS Lines,
+          DATE_FORMAT(t.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
+        FROM (
+            SELECT 
+                u.Username,
+                g.FinalScore,
+                g.LevelReached,
+                g.LinesCleared,
+                g.DatePlayed
+            FROM gamesession g
+            JOIN user u ON g.UserID = u.UserID
+            JOIN (
+                SELECT UserID, MAX(FinalScore) AS BestScore
+                FROM gamesession
+                GROUP BY UserID
+            ) best ON g.UserID = best.UserID AND g.FinalScore = best.BestScore
+            ORDER BY g.FinalScore DESC
+        ) t,
+        (SELECT @rank := 0) r
+        LIMIT 25`
     );
 
     res.json(rows);
@@ -154,9 +168,3 @@ app.get("/api/leaderboard", async (req, res) => {
     res.status(500).json({ error: "Failed to retrieve leaderboard" });
   }
 });
-
-app.get("/", (req, res) => {
-  res.send("API running — try /api/register, /api/login, /api/score, or /api/leaderboard");
-});
-
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
