@@ -34,6 +34,15 @@
   <a href="./index.html">Back to Home</a>
 </div>
 
+<div id="loginWarning" style="
+  color: red; 
+  text-align: center; 
+  margin-top: 20px; 
+  font-weight: bold;
+">
+</div>
+
+
 <script>
   // ===========================
   //  Login State Checker
@@ -44,6 +53,7 @@
   const signupLink = document.getElementById("signupLink");
   const userDisplay = document.getElementById("userDisplay");
   const logoutBtn = document.getElementById("logoutBtn");
+  const loginWarning = document.getElementById("loginWarning");
 
   if (username) {
     // User IS logged in
@@ -52,10 +62,15 @@
     loginLink.style.display = "none";
     signupLink.style.display = "none";
     logoutBtn.style.display = "inline-block";
+
+    loginWarning.textContent = ""; // remove warning
   } else {
     // User NOT logged in
     userDisplay.textContent = "";
     logoutBtn.style.display = "none";
+
+    loginWarning.textContent =
+      "⚠ You are not logged in — your score will NOT be saved!";
   }
 
   // ===========================
@@ -66,6 +81,7 @@
     window.location.reload();  // refresh the page so UI updates
   });
 </script>
+
 
 <script src="./scripts/game.js" defer></script>
 

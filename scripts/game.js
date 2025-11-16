@@ -493,25 +493,30 @@ grid[r][c] = BORDER;
 }
 
 function sendScoreToServer() {
-    // Fallback username (so it’s never undefined or empty)
-    var username = localStorage.getItem('username') || 'guest';
+    var username = localStorage.getItem('username');
     var score = scoreboard.getScore();
 
-    // Ensure score is numeric and > 0
-    if (!username || isNaN(score)) {
-        console.warn("Invalid username or score:", username, score);
+    // If not logged in — block score submission completely
+    if (!username) {
+        console.warn("User not logged in — score not saved");
+        return; 
+    }
+
+    if (isNaN(score) || score <= 0) {
+        console.warn("Invalid score:", score);
         return;
     }
 
     fetch('https://website-game-dbmgnt-production.up.railway.app/api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, score: score })
+        body: JSON.stringify({ username, score })
     })
     .then(res => res.json())
     .then(data => console.log('Score saved:', data))
     .catch(err => console.error('Error sending score:', err));
 }
+
 
 
 function init() {
