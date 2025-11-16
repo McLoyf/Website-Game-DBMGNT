@@ -9,24 +9,65 @@
 </head>
 
 <body class="index-page">
+
 <header class="header">
   <div class="logo"><img src="./media/logo.png" alt="Tetris logo"></div>
+  
   <nav class="nav">
-    <a href="./pages/login.html">Login</a>
-    <a href="./pages/signup.html">Signup</a>
+    <a href="./pages/login.html" id="loginLink">Login</a>
+    <a href="./pages/signup.html" id="signupLink">Signup</a>
     <a href="./pages/leaderboard.html">Leaderboard</a>
+
+    <!-- 🔥 New: Username display -->
+    <span id="userDisplay" style="margin-left: 15px; font-weight: bold;"></span>
+
+    <!-- 🔥 New: Logout button -->
+    <button id="logoutBtn" style="display:none; margin-left: 10px;">Logout</button>
   </nav>
 </header>
 
-  <div class="page-content">
-    <canvas id="game"></canvas>
-  </div>
+<div class="page-content">
+  <canvas id="game"></canvas>
+</div>
 
-  <div class="bottom-link">
-    <a href="./index.html">Back to Home</a>
-  </div>
+<div class="bottom-link">
+  <a href="./index.html">Back to Home</a>
+</div>
 
-  <script src="./scripts/game.js" defer></script>
+<script>
+  // ===========================
+  //  Login State Checker
+  // ===========================
+  const username = localStorage.getItem("username");
+
+  const loginLink = document.getElementById("loginLink");
+  const signupLink = document.getElementById("signupLink");
+  const userDisplay = document.getElementById("userDisplay");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (username) {
+    // User IS logged in
+    userDisplay.textContent = "Logged in as: " + username;
+
+    loginLink.style.display = "none";
+    signupLink.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+  } else {
+    // User NOT logged in
+    userDisplay.textContent = "";
+    logoutBtn.style.display = "none";
+  }
+
+  // ===========================
+  //  Logout functionality
+  // ===========================
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("username");
+    window.location.reload();  // refresh the page so UI updates
+  });
+</script>
+
+<script src="./scripts/game.js" defer></script>
+
 </body>
-
 </html>
