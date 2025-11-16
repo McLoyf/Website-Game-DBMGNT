@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response.ok) {
           output.textContent = "✅ Login successful!";
           output.style.color = "lightgreen";
+          localStorage.setItem("username", username);
           // You can redirect if needed:
           // window.location.href = "../game/index.html";
         } else {
