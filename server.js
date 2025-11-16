@@ -151,27 +151,21 @@ app.post("/api/score", async (req, res) => {
 ============================== */
 app.get("/api/leaderboard", async (req, res) => {
   try {
+    // Initialize row number
+    await pool.query("SET @r := 0");
+
     const [rows] = await pool.query(
-      `SELECT 
+      `SELECT
           @r := @r + 1 AS RankPos,
-          t.Username AS Player,
-          t.FinalScore AS Score,
-          t.LevelReached AS Level,
-          t.LinesCleared AS Lines,
-          DATE_FORMAT(t.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
-        FROM (
-          SELECT 
-            u.Username,
-            g.FinalScore,
-            g.LevelReached,
-            g.LinesCleared,
-            g.DatePlayed
-          FROM gamesession g
-          JOIN user u ON g.UserID = u.UserID
-          ORDER BY g.FinalScore DESC
-        ) AS t
-        CROSS JOIN (SELECT @r := 0) AS r
-        LIMIT 25;`
+          u.Username AS Player,
+          g.FinalScore AS Score,
+          g.LevelReached AS Level,
+          g.LinesCleared AS Lines,
+          DATE_FORMAT(g.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
+       FROM gamesession g
+       JOIN user u ON g.UserID = u.UserID
+       ORDER BY g.FinalScore DESC
+       LIMIT 25;`
     );
 
     res.json(rows);
@@ -180,6 +174,7 @@ app.get("/api/leaderboard", async (req, res) => {
     res.status(500).json({ error: "Failed to retrieve leaderboard" });
   }
 });
+
 
 /* ==============================
    ROOT ROUTE
