@@ -151,7 +151,6 @@ app.post("/api/score", async (req, res) => {
 ============================== */
 app.get("/api/leaderboard", async (req, res) => {
   try {
-    // Initialize row number
     await pool.query("SET @r := 0");
 
     const [rows] = await pool.query(
@@ -160,7 +159,7 @@ app.get("/api/leaderboard", async (req, res) => {
           u.Username AS Player,
           g.FinalScore AS Score,
           g.LevelReached AS Level,
-          g.LinesCleared AS Lines,
+          g.LinesCleared AS LinesClearedValue,
           DATE_FORMAT(g.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
        FROM gamesession g
        JOIN user u ON g.UserID = u.UserID
@@ -174,6 +173,7 @@ app.get("/api/leaderboard", async (req, res) => {
     res.status(500).json({ error: "Failed to retrieve leaderboard" });
   }
 });
+
 
 
 /* ==============================
