@@ -63,7 +63,7 @@ async function loadScores() {
     });
 
   } catch (err) {
-    console.error("❌ Error loading score history:", err);
+    console.error("Error loading score history:", err);
   }
 }
 
@@ -102,11 +102,11 @@ userInfo.innerHTML = `
 //   </tr>
 // `;
 
-document.getElementById("updateUsernameBtn").onclick = () =>
-  alert("Update username feature coming soon.");
-document.getElementById("updateEmailBtn").onclick = () =>
-  alert("Update email feature coming soon.");
-document.getElementById("updatePasswordBtn").onclick = () =>
-  alert("Update password feature coming soon.");
+// document.getElementById("updateUsernameBtn").onclick = () =>
+//   alert("Update username feature coming soon.");
+// document.getElementById("updateEmailBtn").onclick = () =>
+//   alert("Update email feature coming soon.");
+// document.getElementById("updatePasswordBtn").onclick = () =>
+//   alert("Update password feature coming soon.");
 
 loadScores();
