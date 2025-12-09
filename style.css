@@ -253,6 +253,26 @@ body.content-page {
   text-align: center;
 }
 
+/* ============================
+   PAGE TYPE: CONTENT PAGE
+   (leaderboard, user, index)
+   ============================ */
+
+body.content-page {
+  display: block !important;     /* restore normal vertical flow */
+  min-height: 100vh;
+  background: #0b1220;
+  color: #e6eef8;
+  padding-top: 6rem;             /* space for header, if present */
+}
+
+/* center the main card or page contents horizontally */
+body.content-page main,
+body.content-page .wrapper,
+body.content-page .page-content {
+  margin-left: auto;
+  margin-right: auto;
+}
 
 
 
