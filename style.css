@@ -274,21 +274,11 @@ body.content-page .page-content {
   margin-right: auto;
 }
 
-/* Tetris game container on index.html */
-.index-page .page-content {
-  /* shrink to fit the canvas instead of taking 100% width */
-  width: fit-content;          /* or max-content if you prefer */
-
-  /* center horizontally and push it down below the header */
-
-
-  /* keep your existing look */
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  border-radius: 12px;
-  padding: 2rem;
-  backdrop-filter: blur(8px);
+body.index-page {
+  background: radial-gradient(circle at center, #0b1220 0%, #050a15 100%);
+  color: #e6eef8;
+  overflow: hidden;
 }
+
 
 
