@@ -204,13 +204,19 @@ h1, .game-title {
   border-radius: 8px;
 }
 
+body.leaderboard-page {
+  display: block; /* override flex so footer sits below content */
+  background: #0b1220;
+  color: #e6eef8;
+}
+
 .bottom-link {
-  position: fixed;
-  bottom: 1rem;
-  left: 0;
   width: 100%;
   text-align: center;
-  pointer-events: auto;
+  margin-top: 2rem;
+  padding-bottom: 1rem;
+  position: relative; /* NOT absolute */
 }
+
 
 
