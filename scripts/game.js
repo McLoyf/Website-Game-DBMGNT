@@ -496,15 +496,17 @@ function sendScoreToServer() {
 
     if (!username) return;
     if (score <= 0) return;
+    fetch(`https://website-game-dbmgnt-production.up.railway.app/api/score/api/score`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+        username,
+        score,
+        level: levelReached,
+        lines: linesCleared
+  })
+});
 
-    fetch('https://website-game-dbmgnt-production.up.railway.app/api/score/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, score, level, lines })
-    })
-    .then(res => res.json())
-    .then(data => console.log('Score update:', data))
-    .catch(err => console.error('Error sending score:', err));
 }
 
 

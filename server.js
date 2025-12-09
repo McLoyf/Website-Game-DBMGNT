@@ -140,28 +140,29 @@ app.post("/api/score", async (req, res) => {
 app.get("/api/leaderboard", async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT 
+      `SELECT
           u.Username AS Player,
           gs.FinalScore AS Score,
           gs.LevelReached AS Level,
           gs.LinesCleared AS Lines,
           DATE_FORMAT(gs.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
        FROM gamesession gs
-       JOIN user u ON gs.UserID = u.UserID
-       JOIN (
-           SELECT UserID, MAX(FinalScore) AS MaxScore
+       JOIN user u ON u.UserID = gs.UserID
+       WHERE gs.FinalScore = (
+           SELECT MAX(FinalScore)
            FROM gamesession
-           GROUP BY UserID
-       ) best ON best.UserID = gs.UserID AND best.MaxScore = gs.FinalScore
+           WHERE UserID = gs.UserID
+       )
        ORDER BY gs.FinalScore DESC`
     );
 
     res.json(rows);
   } catch (err) {
-    console.error("❌ /api/leaderboard internal error:", err);
+    console.error("❌ leaderboard error:", err);
     res.json([]);
   }
 });
+
 
 
 app.post("/api/score/update", async (req, res) => {
