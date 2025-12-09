@@ -257,3 +257,8 @@ body.content-page #leaderboard-body {
   margin-left: auto;
   margin-right: auto;
 }
+
+body.user-page .wrapper {
+  margin: 0 auto;
+  width: min(700px, 95%);
+}
