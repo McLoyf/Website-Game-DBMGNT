@@ -489,25 +489,27 @@ grid[r][c] = BORDER;
 }
 
 function sendScoreToServer() {
-    var username = localStorage.getItem('username');
-    var score = scoreboard.getScore();
-    var level = scoreboard.getLevel();
-    var lines = scoreboard.getLines();
+    const username = localStorage.getItem('username');
+    const score = scoreboard.getScore();
+    const level = scoreboard.getLevel();
+    const lines = scoreboard.getLines();
 
     if (!username) return;
     if (score <= 0) return;
-    fetch(`https://website-game-dbmgnt-production.up.railway.app/api/score/api/score`, {
+
+    fetch(`https://website-game-dbmgnt-production.up.railway.app/api/score`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-        username,
-        score,
-        level: levelReached,
-        lines: linesCleared
-  })
-});
-
+            username,
+            score,
+            level,
+            lines
+        })
+    })
+    .catch(err => console.error("Score send error:", err));
 }
+
 
 
 
