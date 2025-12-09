@@ -205,18 +205,22 @@ h1, .game-title {
 }
 
 body.leaderboard-page {
-  display: block; /* override flex so footer sits below content */
-  background: #0b1220;
-  color: #e6eef8;
+  display: block !important;
+  min-height: 100vh;
+  padding: 4rem 0; /* keeps header from smashing content */
 }
 
+body.leaderboard-page .card {
+  margin: 0 auto; /* center horizontally */
+}
+
+
 .bottom-link {
-  width: 100%;
   text-align: center;
   margin-top: 2rem;
-  padding-bottom: 1rem;
-  position: relative; /* NOT absolute */
+  padding-bottom: 2rem;
 }
+
 
 
 
