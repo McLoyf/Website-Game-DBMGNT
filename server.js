@@ -9,9 +9,6 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ==============================
-   CORS — must run BEFORE routes
-============================== */
 app.use(
   cors({
     origin: "https://mcloyf.github.io",
@@ -25,28 +22,22 @@ app.use(
 app.use(bodyParser.json());
 app.use(express.json());
 
-/* ==============================
-   Path setup
-============================== */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(__dirname));
 
-/* ==============================
-   MySQL Connection (Railway Safe)
-============================== */
 const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
   password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE || "railway", // IMPORTANT
+  database: process.env.MYSQLDATABASE || "railway",
   port: process.env.MYSQLPORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
 
-// Verify MySQL connection works
+
 (async () => {
   try {
     const conn = await pool.getConnection();
@@ -57,9 +48,6 @@ const pool = mysql.createPool({
   }
 })();
 
-/* ==============================
-   REGISTER
-============================== */
 app.post("/api/register", async (req, res) => {
   try {
     const { firstName, lastName, email, username, password } = req.body;
@@ -87,9 +75,6 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-/* ==============================
-   LOGIN
-============================== */
 app.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -113,9 +98,6 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-/* ==============================
-   SCORE SUBMISSION
-============================== */
 app.post("/api/score", async (req, res) => {
   try {
     const { username, score, level = 0, lines = 0 } = req.body;
@@ -146,9 +128,6 @@ app.post("/api/score", async (req, res) => {
   }
 });
 
-/* ==============================
-   LEADERBOARD (Stable Version)
-============================== */
 app.get("/api/leaderboard", async (req, res) => {
   try {
     await pool.query("SET @r := 0");
@@ -174,18 +153,134 @@ app.get("/api/leaderboard", async (req, res) => {
   }
 });
 
+app.post("/api/score/update", async (req, res) => {
+  try {
+    const { username, score, level = 0, lines = 0 } = req.body;
+
+    if (!username || score == null)
+      return res.status(400).json({ error: "Missing username or score" });
+
+    // get user
+    const [users] = await pool.query(
+      "SELECT UserID FROM user WHERE Username = ?",
+      [username]
+    );
+    if (users.length === 0)
+      return res.status(404).json({ error: "User not found" });
+
+    const userId = users[0].UserID;
+
+    // get high score
+    const [rows] = await pool.query(
+      "SELECT GameSessionID, FinalScore FROM gamesession WHERE UserID = ? ORDER BY FinalScore DESC LIMIT 1",
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      // no previous record → create first one
+      await pool.query(
+        `INSERT INTO gamesession (UserID, FinalScore, LevelReached, LinesCleared, TimePlayed, DatePlayed)
+         VALUES (?, ?, ?, ?, NOW(), NOW())`,
+        [userId, score, level, lines]
+      );
+      return res.json({ message: "First score saved!" });
+    }
+
+    const best = rows[0];
+
+    // compare new score with high score
+    if (score > best.FinalScore) {
+      await pool.query(
+        `UPDATE gamesession 
+         SET FinalScore = ?, LevelReached = ?, LinesCleared = ?, DatePlayed = NOW()
+         WHERE GameSessionID = ?`,
+        [score, level, lines, best.GameSessionID]
+      );
+      return res.json({ message: "High score updated!" });
+    }
+
+    return res.json({ message: "Score not higher; no update made." });
+
+  } catch (err) {
+    console.error("❌ /api/score/update error:", err);
+    res.status(500).json({ error: "Failed to update high score" });
+  }
+});
+
+app.delete("/api/score/:sessionId", async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+    const { username } = req.body;
+
+    if (!username)
+      return res.status(400).json({ error: "Missing username" });
+
+    // get user
+    const [users] = await pool.query(
+      "SELECT UserID FROM user WHERE Username = ?",
+      [username]
+    );
+    if (users.length === 0)
+      return res.status(404).json({ error: "User not found" });
+
+    const userId = users[0].UserID;
+
+    const [rows] = await pool.query(
+      "SELECT * FROM gamesession WHERE GameSessionID = ? AND UserID = ?",
+      [sessionId, userId]
+    );
+
+    if (rows.length === 0)
+      return res.status(403).json({ error: "Score does not belong to this user" });
+
+    await pool.query(
+      "DELETE FROM gamesession WHERE GameSessionID = ?",
+      [sessionId]
+    );
+
+    res.json({ message: "Score deleted!" });
+
+  } catch (err) {
+    console.error("❌ DELETE /api/score/:sessionId error:", err);
+    res.status(500).json({ error: "Failed to delete score" });
+  }
+});
+
+app.post("/api/user/scores", async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    const [users] = await pool.query(
+      "SELECT UserID FROM user WHERE Username = ?",
+      [username]
+    );
+    if (users.length === 0)
+      return res.status(404).json({ error: "User not found" });
+
+    const userId = users[0].UserID;
+
+    const [scores] = await pool.query(
+      `SELECT GameSessionID, FinalScore, LevelReached, LinesCleared,
+              DATE_FORMAT(DatePlayed, '%Y-%m-%d %H:%i') AS DatePlayed
+       FROM gamesession
+       WHERE UserID = ?
+       ORDER BY FinalScore DESC`,
+      [userId]
+    );
+
+    res.json(scores);
+
+  } catch (err) {
+    console.error("❌ /api/user/scores error:", err);
+    res.status(500).json({ error: "Failed to load scores" });
+  }
+});
 
 
-/* ==============================
-   ROOT ROUTE
-============================== */
 app.get("/", (req, res) => {
   res.send("API running — try /api/register, /api/login, /api/score, /api/leaderboard");
 });
 
-/* ==============================
-   START SERVER
-============================== */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -18,10 +18,9 @@
     <a href="./pages/signup.html" id="signupLink">Signup</a>
     <a href="./pages/leaderboard.html">Leaderboard</a>
 
-    <!-- 🔥 New: Username display -->
     <span id="userDisplay" style="margin-left: 15px; font-weight: bold;"></span>
+    <a href="./pages/user.html" id="userLink" style="display:none;">User Page</a>
 
-    <!-- 🔥 New: Logout button -->
     <button id="logoutBtn" style="display:none; margin-left: 10px;">Logout</button>
   </nav>
 </header>
@@ -44,9 +43,6 @@
 
 
 <script>
-  // ===========================
-  //  Login State Checker
-  // ===========================
   const username = localStorage.getItem("username");
 
   const loginLink = document.getElementById("loginLink");
@@ -54,31 +50,29 @@
   const userDisplay = document.getElementById("userDisplay");
   const logoutBtn = document.getElementById("logoutBtn");
   const loginWarning = document.getElementById("loginWarning");
+  const userLink = document.getElementById("userLink");
 
   if (username) {
-    // User IS logged in
     userDisplay.textContent = "Logged in as: " + username;
 
+    userLink.style.display = "inline-block";
     loginLink.style.display = "none";
     signupLink.style.display = "none";
     logoutBtn.style.display = "inline-block";
 
-    loginWarning.textContent = ""; // remove warning
+    loginWarning.textContent = "";
   } else {
-    // User NOT logged in
     userDisplay.textContent = "";
     logoutBtn.style.display = "none";
+    userLink.style.display = "none";
 
     loginWarning.textContent =
       "⚠ You are not logged in — your score will NOT be saved!";
   }
 
-  // ===========================
-  //  Logout functionality
-  // ===========================
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("username");
-    window.location.reload();  // refresh the page so UI updates
+    window.location.reload();
   });
 </script>
 

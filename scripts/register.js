@@ -1,11 +1,9 @@
-// scripts/register.js
 const BACKEND_URL = "https://website-game-dbmgnt-production.up.railway.app";
 
 document.addEventListener("DOMContentLoaded", () => {
   const registerForm = document.getElementById("registerForm");
   const loginForm = document.getElementById("loginForm");
 
-  // 🟢 SIGNUP HANDLER
   if (registerForm) {
     registerForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -43,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🟢 LOGIN HANDLER
   if (loginForm) {
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -65,8 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
           output.textContent = "✅ Login successful!";
           output.style.color = "lightgreen";
           localStorage.setItem("username", username);
-          // You can redirect if needed:
-          // window.location.href = "../game/index.html";
         } else {
           output.textContent = `❌ ${data.error || "Invalid credentials"}`;
           output.style.color = "red";

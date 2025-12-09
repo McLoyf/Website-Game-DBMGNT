@@ -56,7 +56,6 @@ var grid = [];
 var scoreboard = new Scoreboard();
 
 
-// A key OR ArrowLeft → move left one cell
 window.addEventListener('keydown', function (e) {
     if (scoreboard.isGameOver()) return;
     if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
@@ -67,7 +66,6 @@ window.addEventListener('keydown', function (e) {
     }
 });
 
-// D key OR ArrowRight → move right one cell
 window.addEventListener('keydown', function (e) {
     if (scoreboard.isGameOver()) return;
     if (e.code === 'KeyD' || e.code === 'ArrowRight') {
@@ -78,7 +76,6 @@ window.addEventListener('keydown', function (e) {
     }
 });
 
-// S key OR ArrowDown → move down one cell (no hard drop)
 window.addEventListener('keydown', function (e) {
     if (scoreboard.isGameOver()) return;
     if (e.code === 'KeyS' || e.code === 'ArrowDown') {
@@ -89,7 +86,7 @@ window.addEventListener('keydown', function (e) {
     }
 });
 
-// W key OR ArrowUp → rotate
+
 window.addEventListener('keydown', function (e) {
     if (scoreboard.isGameOver()) return;
     if (e.code === 'KeyW' || e.code === 'ArrowUp') {
@@ -162,13 +159,12 @@ function shapeHasLanded() {
     if (fallingShapeRow < 2) {
         scoreboard.setGameOver();
         scoreboard.setTopscore();
-        sendScoreToServer(); // ✅ send score on game over
+        sendScoreToServer();
         return;
     } else {
         scoreboard.addLines(removeLines());
     }
 
-    // ✅ Add 10 points every time a new block spawns
     scoreboard.addScore(10);
 
     selectShape();
@@ -495,25 +491,19 @@ grid[r][c] = BORDER;
 function sendScoreToServer() {
     var username = localStorage.getItem('username');
     var score = scoreboard.getScore();
+    var level = scoreboard.getLevel();
+    var lines = scoreboard.getLines();
 
-    // If not logged in — block score submission completely
-    if (!username) {
-        console.warn("User not logged in — score not saved");
-        return; 
-    }
+    if (!username) return;
+    if (score <= 0) return;
 
-    if (isNaN(score) || score <= 0) {
-        console.warn("Invalid score:", score);
-        return;
-    }
-
-    fetch('https://website-game-dbmgnt-production.up.railway.app/api/score', {
+    fetch('https://website-game-dbmgnt-production.up.railway.app/api/score/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, score })
+        body: JSON.stringify({ username, score, level, lines })
     })
     .then(res => res.json())
-    .then(data => console.log('Score saved:', data))
+    .then(data => console.log('Score update:', data))
     .catch(err => console.error('Error sending score:', err));
 }
 
