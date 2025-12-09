@@ -157,55 +157,64 @@ app.post("/api/score/update", async (req, res) => {
   try {
     const { username, score, level = 0, lines = 0 } = req.body;
 
-    if (!username || score == null)
-      return res.status(400).json({ error: "Missing username or score" });
+    if (!username || score == null) {
+      console.warn("⚠ Missing username or score");
+      return res.json({ message: "Invalid score submission" });
+    }
 
-    // get user
+    // find user
     const [users] = await pool.query(
       "SELECT UserID FROM user WHERE Username = ?",
       [username]
     );
-    if (users.length === 0)
-      return res.status(404).json({ error: "User not found" });
+
+    if (users.length === 0) {
+      console.warn("⚠ User not found for score update:", username);
+      return res.json({ message: "User not found" });
+    }
 
     const userId = users[0].UserID;
 
-    // get high score
+    // get highest previous score
     const [rows] = await pool.query(
-      "SELECT GameSessionID, FinalScore FROM gamesession WHERE UserID = ? ORDER BY FinalScore DESC LIMIT 1",
+      "SELECT SessionID, FinalScore FROM gamesession WHERE UserID = ? ORDER BY FinalScore DESC LIMIT 1",
       [userId]
     );
 
     if (rows.length === 0) {
-      // no previous record → create first one
+      // first score ever → insert
       await pool.query(
-        `INSERT INTO gamesession (UserID, FinalScore, LevelReached, LinesCleared, TimePlayed, DatePlayed)
+        `INSERT INTO gamesession
+         (UserID, FinalScore, LevelReached, LinesCleared, TimePlayed, DatePlayed)
          VALUES (?, ?, ?, ?, NOW(), NOW())`,
         [userId, score, level, lines]
       );
+
       return res.json({ message: "First score saved!" });
     }
 
     const best = rows[0];
 
-    // compare new score with high score
+    // update only if new score is better
     if (score > best.FinalScore) {
       await pool.query(
-        `UPDATE gamesession 
+        `UPDATE gamesession
          SET FinalScore = ?, LevelReached = ?, LinesCleared = ?, DatePlayed = NOW()
-         WHERE GameSessionID = ?`,
-        [score, level, lines, best.GameSessionID]
+         WHERE SessionID = ?`,
+        [score, level, lines, best.SessionID]
       );
+
       return res.json({ message: "High score updated!" });
     }
 
-    return res.json({ message: "Score not higher; no update made." });
+    return res.json({ message: "Score not higher — no update made." });
 
   } catch (err) {
-    console.error("❌ /api/score/update error:", err);
-    res.status(500).json({ error: "Failed to update high score" });
+    console.error("❌ /api/score/update internal error (non-fatal):", err);
+    res.json({ message: "Score update skipped due to server issue" });
   }
 });
+
 
 app.delete("/api/score/:sessionId", async (req, res) => {
   try {
