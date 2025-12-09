@@ -35,23 +35,23 @@ async function loadScores() {
 
   scoreTableBody.innerHTML = "";
 
-  data.forEach(row => {
-    const tr = document.createElement("tr");
+  scores.forEach(row => {
+  const tr = document.createElement("tr");
 
-    tr.innerHTML = `
-      <td>${row.FinalScore}</td>
-      <td>${row.LevelReached}</td>
-      <td>${row.LinesCleared}</td>
-      <td>${row.DatePlayed}</td>
-      <td>
-        <button class="button deleteScoreBtn" data-id="${score.SessionID}">
-          Delete
-        </button>
-      </td>
-    `;
+  tr.innerHTML = `
+    <td>${row.FinalScore}</td>
+    <td>${row.LevelReached}</td>
+    <td>${row.LinesCleared}</td>
+    <td>${row.DatePlayed}</td>
+    <td>
+      <button class="button deleteScoreBtn" data-id="${row.SessionID}">
+        Delete
+      </button>
+    </td>
+  `;
 
-    scoreTableBody.appendChild(tr);
-  });
+  scoreTableBody.appendChild(tr);
+});
 
   document.querySelectorAll(".deleteScoreBtn").forEach(btn => {
     btn.addEventListener("click", deleteScore);
