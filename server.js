@@ -215,7 +215,6 @@ app.delete("/api/score/:sessionId", async (req, res) => {
     if (!username)
       return res.status(400).json({ error: "Missing username" });
 
-    // get user
     const [users] = await pool.query(
       "SELECT UserID FROM user WHERE Username = ?",
       [username]
@@ -226,7 +225,7 @@ app.delete("/api/score/:sessionId", async (req, res) => {
     const userId = users[0].UserID;
 
     const [rows] = await pool.query(
-      "SELECT * FROM gamesession WHERE GameSessionID = ? AND UserID = ?",
+      "SELECT * FROM gamesession WHERE SessionID = ? AND UserID = ?",
       [sessionId, userId]
     );
 
@@ -234,7 +233,7 @@ app.delete("/api/score/:sessionId", async (req, res) => {
       return res.status(403).json({ error: "Score does not belong to this user" });
 
     await pool.query(
-      "DELETE FROM gamesession WHERE GameSessionID = ?",
+      "DELETE FROM gamesession WHERE SessionID = ?",
       [sessionId]
     );
 
@@ -246,9 +245,13 @@ app.delete("/api/score/:sessionId", async (req, res) => {
   }
 });
 
+
 app.post("/api/user/scores", async (req, res) => {
   try {
     const { username } = req.body;
+
+    if (!username)
+      return res.status(400).json({ error: "Missing username" });
 
     const [users] = await pool.query(
       "SELECT UserID FROM user WHERE Username = ?",
@@ -260,8 +263,12 @@ app.post("/api/user/scores", async (req, res) => {
     const userId = users[0].UserID;
 
     const [scores] = await pool.query(
-      `SELECT GameSessionID, FinalScore, LevelReached, LinesCleared,
-              DATE_FORMAT(DatePlayed, '%Y-%m-%d %H:%i') AS DatePlayed
+      `SELECT 
+         SessionID,
+         FinalScore,
+         LevelReached,
+         LinesCleared,
+         DATE_FORMAT(DatePlayed, '%Y-%m-%d %H:%i') AS DatePlayed
        FROM gamesession
        WHERE UserID = ?
        ORDER BY FinalScore DESC`,
@@ -272,9 +279,10 @@ app.post("/api/user/scores", async (req, res) => {
 
   } catch (err) {
     console.error("❌ /api/user/scores error:", err);
-    res.status(500).json({ error: "Failed to load scores" });
+    res.status(500).json({ error: "Failed to load score history" });
   }
 });
+
 
 
 app.get("/", (req, res) => {
