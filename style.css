@@ -1,20 +1,90 @@
-/* === Shared Base === */
+/* =========================================
+   GLOBAL BASE STYLES
+========================================= */
+
 :root {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
   margin: 0;
+  padding: 0;
   color-scheme: dark;
 }
 
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
+  margin: 0;
   background: #0b1220;
   color: #e6eef8;
 }
 
-/* === Form Card Container === */
+
+/* =========================================
+   PAGE TYPES
+========================================= */
+
+/* LOGIN + SIGNUP (centered forms) */
+body.centered-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* PAGES WITH REAL CONTENT (index, leaderboard, user) */
+body.content-page {
+  display: block;
+  padding-top: 7rem; /* space for header */
+}
+
+
+/* =========================================
+   HEADER / NAVBAR
+========================================= */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.7rem 0;
+  background-color: rgba(30, 30, 40, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1000;
+}
+
+.logo img {
+  position: absolute;
+  left: 2rem;
+  top: 0.7rem;
+  height: 50px;
+  width: auto;
+  border-radius: 8px;
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #e6eef8;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav a:hover {
+  color: #45f3ff;
+}
+
+
+/* =========================================
+   FORM CARD (used on login & signup)
+========================================= */
+
 .wrapper {
   width: min(400px, 90%);
   background: linear-gradient(180deg, #0f1724 0%, #071227 100%);
@@ -27,7 +97,6 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
-/* === Headings === */
 h1 {
   font-size: 22px;
   margin-bottom: 1.5rem;
@@ -35,7 +104,6 @@ h1 {
   color: #d5e1f5;
 }
 
-/* === Input Boxes === */
 .input-box {
   width: 100%;
   margin-bottom: 1.1rem;
@@ -58,7 +126,6 @@ h1 {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* === Buttons === */
 .button {
   background: #172a45;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -83,25 +150,92 @@ h1 {
   transform: scale(0.98);
 }
 
-/* === Forgot password / Links === */
 .forgot, .bottom-link {
   margin-top: 1.5rem;
   text-align: center;
 }
 
-.forgot a, .bottom-link a {
+.forgot a,
+.bottom-link a {
   color: #9fb0c9;
   text-decoration: none;
   font-size: 13px;
   transition: color 0.2s ease;
 }
 
-.forgot a:hover, .bottom-link a:hover {
+.forgot a:hover,
+.bottom-link a:hover {
   color: #45f3ff;
   text-decoration: underline;
 }
 
-/* === Output messages === */
+
+/* Center the bottom link for ALL pages */
+.bottom-link {
+  width: 100%;
+  text-align: center;
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+
+/* Fix bottom link on centered pages */
+body.centered-page .bottom-link {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+/* =========================================
+   INDEX PAGE (Tetris game)
+========================================= */
+
+body.index-page {
+  background: radial-gradient(circle at center, #0b1220 0%, #050a15 100%);
+}
+
+.index-page .page-content {
+  width: fit-content;
+  margin: 0 auto;   /* <-- centers the game box */
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+canvas {
+  filter: drop-shadow(0 0 25px rgba(66, 180, 255, 0.35));
+}
+
+
+/* =========================================
+   LEADERBOARD PAGE
+========================================= */
+
+body.leaderboard-page main.card {
+  margin: 0 auto;
+  width: min(900px, 95%);
+}
+
+
+/* =========================================
+   USER PAGE (score history)
+========================================= */
+
+.user-container {
+  width: min(900px, 95%);
+  margin: 0 auto;
+}
+
+
+/* =========================================
+   MISC
+========================================= */
+
 #output {
   margin-top: 1rem;
   font-size: 14px;
@@ -109,176 +243,7 @@ h1 {
   text-align: center;
 }
 
-/* === Small animations === */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-/* === Tetris Index Page Enhancements === */
-
-body.index-page {
-  background: radial-gradient(circle at center, #0b1220 0%, #050a15 100%);
-  color: #e6eef8;
-  overflow: hidden;
-}
-
-/* Glow effect for the game frame */
-canvas {
-  filter: drop-shadow(0 0 25px rgba(66, 180, 255, 0.35));
-}
-
-/* Subtle glass frame around the whole Tetris board */
-.page-content {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  border-radius: 12px;
-  padding: 2rem;
-  backdrop-filter: blur(8px);
-}
-
-/* Make the Tetris title pop */
-h1, .game-title {
-  font-family: sans-serif;
-  color: #45f3ff;
-  text-shadow: 0 0 8px rgba(69, 243, 255, 0.4);
-}
-
-/* Make "click to start" feel like a button */
-.click-to-start {
-  background: #1b355a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 0.5rem 1.2rem;
-  color: #e6eef8;
-  text-transform: uppercase;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.click-to-start:hover {
-  background: #45f3ff;
-  color: #000;
-  transform: scale(1.05);
-}
-
-.header {
-  position: absolute;
-  top: 0;                     /* stick to top */
-  left: 0;
-  width: 100%;                /* full width */
-  display: flex;
-  justify-content: center;    /* center the nav group horizontally */
-  align-items: center;
-  padding: 2rem 0;
-  background-color: rgba(30, 30, 40, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  z-index: 1000;
-}
-
-.nav {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav a {
-  text-decoration: none;
-  color: #e6eef8;
-  font-size: 16px;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.nav a:hover {
-  color: #45f3ff;
-}
-
-.logo img {
-  position: absolute;
-  left: 2rem;
-  top: 1rem;
-  height: 50px;
-  width: auto;
-  border-radius: 8px;
-}
-
-body.leaderboard-page {
-  display: block !important;
-  min-height: 100vh;
-  padding: 4rem 0; /* keeps header from smashing content */
-}
-
-body.leaderboard-page .card {
-  margin: 0 auto; /* center horizontally */
-}
-
-
-.bottom-link {
-  text-align: center;
-  margin-top: 2rem;
-  padding-bottom: 2rem;
-}
-
-.bottom-link a {
-  color: #9fb0c9;
-  text-decoration: none;
-  font-size: 13px;
-}
-
-.bottom-link a:hover {
-  color: #45f3ff;
-}
-
-/* === Default body style for content-heavy pages === */
-body.content-page {
-  display: block !important;     /* normal document flow */
-  min-height: 100vh;
-  background: #0b1220;
-  color: #e6eef8;
-}
-
-.centered-page {
-  position: relative;
-  min-height: 100vh;
-}
-
-.centered-page .bottom-link {
-  position: absolute;
-  bottom: 2rem;      /* pushes link to bottom */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  text-align: center;
-}
-
-/* ============================
-   PAGE TYPE: CONTENT PAGE
-   (leaderboard, user, index)
-   ============================ */
-
-body.content-page {
-  display: block !important;     /* restore normal vertical flow */
-  min-height: 100vh;
-  background: #0b1220;
-  color: #e6eef8;
-  padding-top: 6rem;             /* space for header, if present */
-}
-
-/* center the main card or page contents horizontally */
-body.content-page main,
-body.content-page .wrapper,
-body.content-page .page-content {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-body.index-page {
-  background: radial-gradient(circle at center, #0b1220 0%, #050a15 100%);
-  color: #e6eef8;
-  overflow: hidden;
-}
-
-
-
