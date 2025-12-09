@@ -139,27 +139,17 @@ app.post("/api/score", async (req, res) => {
 
 app.get("/api/leaderboard", async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      `SELECT
-          u.Username AS Player,
-          gs.FinalScore AS Score,
-          gs.LevelReached AS Level,
-          gs.LinesCleared AS Lines,
-          DATE_FORMAT(gs.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
-       FROM gamesession gs
-       JOIN user u ON u.UserID = gs.UserID
-       WHERE gs.FinalScore = (
-           SELECT MAX(FinalScore)
-           FROM gamesession
-           WHERE UserID = gs.UserID
-       )
-       ORDER BY gs.FinalScore DESC`
-    );
+    const [rows] = await pool.query(`
+      SELECT Player, Score, Level, LinesC, PlayedAt
+      FROM LeaderboardView
+      ORDER BY Score DESC
+    `);
 
     res.json(rows);
+
   } catch (err) {
-    console.error("❌ leaderboard error:", err);
-    res.json([]);
+    console.error("Leaderboard error:", err);
+    res.json([]); // fail silently like you wanted
   }
 });
 
