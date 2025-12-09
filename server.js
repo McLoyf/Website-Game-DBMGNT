@@ -102,18 +102,25 @@ app.post("/api/score", async (req, res) => {
   try {
     const { username, score, level = 0, lines = 0 } = req.body;
 
-    if (!username || score == null)
-      return res.status(400).json({ error: "Missing username or score" });
+    if (!username || score == null) {
+      console.warn("⚠ Missing username or score");
+      return res.json({ message: "Invalid score submission" });
+    }
 
-    const [users] = await pool.query(
+    // find user
+    const [u] = await pool.query(
       "SELECT UserID FROM user WHERE Username = ?",
       [username]
     );
-    if (users.length === 0)
-      return res.status(404).json({ error: "User not found" });
 
-    const userId = users[0].UserID;
+    if (u.length === 0) {
+      console.warn("⚠ Unknown user:", username);
+      return res.json({ message: "User not found" });
+    }
 
+    const userId = u[0].UserID;
+
+    // always insert a new score
     await pool.query(
       `INSERT INTO gamesession 
        (UserID, FinalScore, LevelReached, LinesCleared, TimePlayed, DatePlayed)
@@ -121,37 +128,41 @@ app.post("/api/score", async (req, res) => {
       [userId, score, level, lines]
     );
 
-    res.json({ message: "Score saved!" });
+    return res.json({ message: "Score saved!" });
+
   } catch (err) {
-    console.error("❌ Error in /api/score:", err);
-    res.status(500).json({ error: "Failed to save score" });
+    console.error("❌ /api/score internal error:", err);
+    res.json({ message: "Could not save score" });
   }
 });
 
+
 app.get("/api/leaderboard", async (req, res) => {
   try {
-    await pool.query("SET @r := 0");
-
     const [rows] = await pool.query(
-      `SELECT
-          @r := @r + 1 AS RankPos,
+      `SELECT 
           u.Username AS Player,
-          g.FinalScore AS Score,
-          g.LevelReached AS Level,
-          g.LinesCleared AS LinesClearedValue,
-          DATE_FORMAT(g.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
-       FROM gamesession g
-       JOIN user u ON g.UserID = u.UserID
-       ORDER BY g.FinalScore DESC
-       LIMIT 25;`
+          gs.FinalScore AS Score,
+          gs.LevelReached AS Level,
+          gs.LinesCleared AS Lines,
+          DATE_FORMAT(gs.DatePlayed, '%Y-%m-%d %H:%i') AS PlayedAt
+       FROM gamesession gs
+       JOIN user u ON gs.UserID = u.UserID
+       JOIN (
+           SELECT UserID, MAX(FinalScore) AS MaxScore
+           FROM gamesession
+           GROUP BY UserID
+       ) best ON best.UserID = gs.UserID AND best.MaxScore = gs.FinalScore
+       ORDER BY gs.FinalScore DESC`
     );
 
     res.json(rows);
   } catch (err) {
-    console.error("❌ /api/leaderboard error:", err);
-    res.status(500).json({ error: "Failed to retrieve leaderboard" });
+    console.error("❌ /api/leaderboard internal error:", err);
+    res.json([]);
   }
 });
+
 
 app.post("/api/score/update", async (req, res) => {
   try {
