@@ -239,16 +239,20 @@ body.content-page {
   color: #e6eef8;
 }
 
-/* === Centered layout only for login/signup pages === */
-body.centered-page {
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.centered-page {
+  position: relative;
   min-height: 100vh;
-  background: #0b1220;
-  color: #e6eef8;
 }
+
+.centered-page .bottom-link {
+  position: absolute;
+  bottom: 2rem;      /* pushes link to bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+}
+
 
 
 
