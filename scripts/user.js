@@ -82,14 +82,14 @@ userInfo.innerHTML = `
   <p><strong>Email:</strong> (coming soon)</p>
 `;
 
-// Placeholder scores
-scoreTableBody.innerHTML = `
-  <tr>
-    <td colspan="5" style="text-align:center; opacity: 0.6;">
-      (Score history loading soon...)
-    </td>
-  </tr>
-`;
+// // Placeholder scores
+// scoreTableBody.innerHTML = `
+//   <tr>
+//     <td colspan="5" style="text-align:center; opacity: 0.6;">
+//       (Score history loading soon...)
+//     </td>
+//   </tr>
+// `;
 
 document.getElementById("updateUsernameBtn").onclick = () =>
   alert("Update username feature coming soon.");
