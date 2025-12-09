@@ -18,44 +18,53 @@ logoutBtn.addEventListener("click", () => {
 });
 
 async function loadScores() {
-  const res = await fetch(`${BACKEND_URL}/api/user/scores`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username })
-  });
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/user/scores`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
 
-  const data = await res.json();
+    const scores = await res.json(); // <-- THIS defines "scores"
 
-  if (data.length === 0) {
-    scoreTableBody.innerHTML = `
-      <tr><td colspan="5" style="text-align:center; opacity:0.6;">No scores yet.</td></tr>
-    `;
-    return;
+    scoreTableBody.innerHTML = ""; // Clear previous items
+
+    if (!Array.isArray(scores) || scores.length === 0) {
+      scoreTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center; opacity:0.6;">
+            No scores yet.
+          </td>
+        </tr>`;
+      return;
+    }
+
+    scores.forEach(row => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${row.FinalScore}</td>
+        <td>${row.LevelReached}</td>
+        <td>${row.LinesCleared}</td>
+        <td>${row.DatePlayed}</td>
+        <td>
+          <button class="button deleteScoreBtn" data-id="${row.SessionID}">
+            Delete
+          </button>
+        </td>
+      `;
+
+      scoreTableBody.appendChild(tr);
+    });
+
+    // Attach delete events
+    document.querySelectorAll(".deleteScoreBtn").forEach(btn => {
+      btn.addEventListener("click", deleteScore);
+    });
+
+  } catch (err) {
+    console.error("❌ Error loading score history:", err);
   }
-
-  scoreTableBody.innerHTML = "";
-
-  scores.forEach(row => {
-  const tr = document.createElement("tr");
-
-  tr.innerHTML = `
-    <td>${row.FinalScore}</td>
-    <td>${row.LevelReached}</td>
-    <td>${row.LinesCleared}</td>
-    <td>${row.DatePlayed}</td>
-    <td>
-      <button class="button deleteScoreBtn" data-id="${row.SessionID}">
-        Delete
-      </button>
-    </td>
-  `;
-
-  scoreTableBody.appendChild(tr);
-});
-
-  document.querySelectorAll(".deleteScoreBtn").forEach(btn => {
-    btn.addEventListener("click", deleteScore);
-  });
 }
 
 async function deleteScore(event) {
