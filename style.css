@@ -262,3 +262,8 @@ body.user-page .wrapper {
   margin: 0 auto;
   width: min(700px, 95%);
 }
+
+body.index-page {
+  overflow: hidden !important;
+  height: 100vh;
+}
