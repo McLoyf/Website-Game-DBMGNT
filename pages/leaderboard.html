@@ -27,7 +27,6 @@
 <body>
   <main class="card" role="main">
     <h1>Tetris — Leaderboard</h1>
-    <p class="subtitle">Blank leaderboard table ready to be populated by your game (client-side or server-side).</p>
 
     <div class="controls">
       <button class="btn" disabled>Import</button>
@@ -50,7 +49,6 @@
       </tbody>
     </table>
 
-    <p class="small" style="margin-top:14px">Tip: call <code>populateLeaderboard(arrayOfEntries)</code> from your game when a high score is ready to show.</p>
   </main>
 
   <script>
@@ -86,9 +84,6 @@
 
     // Expose helper to window for easy testing in dev console
     window.populateLeaderboard = populateLeaderboard;
-
-    // Uncomment to test sample data on load:
-    //populateLeaderboard([{player:'Player1',score:99999,level:20,lines:400,date:'2025-10-28'}]);
   </script>
 <script>
   async function loadLeaderboard() {

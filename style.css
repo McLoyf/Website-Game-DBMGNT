@@ -204,7 +204,13 @@ h1, .game-title {
   border-radius: 8px;
 }
 
-.bottom-link{
-  position: absolute;
-  bottom: 1em;;
+.bottom-link {
+  position: fixed;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  pointer-events: auto;
 }
+
+
