@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(
   cors({
     origin: "https://mcloyf.github.io",
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
     optionsSuccessStatus: 204,

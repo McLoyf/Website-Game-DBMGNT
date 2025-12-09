@@ -44,7 +44,7 @@ async function loadScores() {
       <td>${row.LinesCleared}</td>
       <td>${row.DatePlayed}</td>
       <td>
-        <button class="button deleteScoreBtn" data-id="${row.GameSessionID}">
+        <button class="button deleteScoreBtn" data-id="${score.SessionID}">
           Delete
         </button>
       </td>
@@ -59,11 +59,11 @@ async function loadScores() {
 }
 
 async function deleteScore(event) {
-  const id = event.target.dataset.id;
+  const sessionId = event.target.dataset.id;
 
   if (!confirm("Delete this score?")) return;
 
-  const res = await fetch(`${BACKEND_URL}/api/score/${id}`, {
+  const res = await fetch(`${BACKEND_URL}/api/score/${sessionId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username })
@@ -74,6 +74,7 @@ async function deleteScore(event) {
 
   loadScores();
 }
+
 
 
 
