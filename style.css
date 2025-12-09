@@ -247,3 +247,13 @@ body.leaderboard-page main.card {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Center main content boxes on leaderboard + user pages */
+body.content-page main.card,
+body.content-page .card,
+body.content-page .user-container,
+body.content-page table,
+body.content-page #leaderboard-body {
+  margin-left: auto;
+  margin-right: auto;
+}
