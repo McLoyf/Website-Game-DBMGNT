@@ -1,4 +1,5 @@
 const username = localStorage.getItem("username");
+const BACKEND_URL = "https://website-game-dbmgnt-production.up.railway.app";
 
 const userDisplay = document.getElementById("userDisplay");
 const logoutBtn = document.getElementById("logoutBtn");
