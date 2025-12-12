@@ -409,10 +409,10 @@ drawRect(outerRect, gridBorderColor);
 // scoreboard
 g.fillStyle = textColor;
 g.font = smallFont;
-g.fillText('hiscore' + scoreboard.getTopscore(), scoreX, scoreY);
-g.fillText('level' + scoreboard.getLevel(), scoreX, scoreY + 30);
-g.fillText('lines' + scoreboard.getLines(), scoreX, scoreY + 60);
-g.fillText('score' + scoreboard.getScore(), scoreX, scoreY + 90);
+g.fillText(`high-score: ${scoreboard.getTopscore()}`, scoreX, scoreY);
+g.fillText('level: ' + scoreboard.getLevel(), scoreX, scoreY + 30);
+g.fillText('lines: ' + scoreboard.getLines(), scoreX, scoreY + 60);
+g.fillText('score: ' + scoreboard.getScore(), scoreX, scoreY + 90);
 
 // preview
 var minX = 5, minY = 5, maxX = 0, maxY = 0;
