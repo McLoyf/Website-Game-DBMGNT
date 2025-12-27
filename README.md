@@ -1,46 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Website-Game-DBMGNT</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      line-height: 1.6;
-      margin: 40px;
-      background: #0f172a;
-      color: #e5e7eb;
-    }
-    h1, h2, h3 {
-      color: #93c5fd;
-    }
-    code, pre {
-      background: #020617;
-      color: #e5e7eb;
-      padding: 6px 8px;
-      border-radius: 6px;
-    }
-    pre {
-      padding: 12px;
-      overflow-x: auto;
-    }
-    a {
-      color: #60a5fa;
-    }
-    .note {
-      background: #1e293b;
-      padding: 12px;
-      border-left: 4px solid #38bdf8;
-      margin: 16px 0;
-    }
-    .warn {
-      background: #1e293b;
-      padding: 12px;
-      border-left: 4px solid #f87171;
-      margin: 16px 0;
-    }
-  </style>
-</head>
+
 <body>
 <h1>Website-Game-DBMGNT</h1>
 This project is a website that hosts a tetris game and can update user info on the connected database which is deployed via Railway. The focus of this project is not the game on the site nor the site itself. The game code is a slightly modified version of RosettaCode's javascript implementation of the game <a href="https://rosettacode.org/wiki/Tetris/JavaScript">Tetris</a>. The CSS styling is made by ChatGPT as to save time for the focus of the project; Creating a schema, connnecting the schema to the front end, and manipulating the data in several ways (INSERT, UPDATE, DELETE).
