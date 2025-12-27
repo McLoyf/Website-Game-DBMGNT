@@ -25,7 +25,7 @@ async function loadScores() {
       body: JSON.stringify({ username })
     });
 
-    const scores = await res.json(); // <-- THIS defines "scores"
+    const scores = await res.json(); // this defines "scores"
 
     scoreTableBody.innerHTML = ""; // Clear previous items
 

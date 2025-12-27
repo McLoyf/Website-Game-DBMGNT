@@ -1,49 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Website-Game-DBMGNT</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      margin: 40px;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    h1, h2, h3 {
+      color: #93c5fd;
+    }
+    code, pre {
+      background: #020617;
+      color: #e5e7eb;
+      padding: 6px 8px;
+      border-radius: 6px;
+    }
+    pre {
+      padding: 12px;
+      overflow-x: auto;
+    }
+    a {
+      color: #60a5fa;
+    }
+    .note {
+      background: #1e293b;
+      padding: 12px;
+      border-left: 4px solid #38bdf8;
+      margin: 16px 0;
+    }
+    .warn {
+      background: #1e293b;
+      padding: 12px;
+      border-left: 4px solid #f87171;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
 <h1>Website-Game-DBMGNT</h1>
-This project is a website that hosts a tetris game on it and it can update user info on the connected database (add more text at some point)
+This project is a website that hosts a tetris game and can update user info on the connected database which is deployed via Railway. The focus of this project is not the game on the site nor the site itself. The game code is a slightly modified version of RosettaCode's javascript implementation of the game <a href="https://rosettacode.org/wiki/Tetris/JavaScript">Tetris</a>. The CSS styling is made by ChatGPT as to save time for the focus of the project; Creating a schema, connnecting the schema to the front end, and manipulating the data in several ways (INSERT, UPDATE, DELETE).
 
-<img src="./media/example_game.png" height="650px">
-<h2>Tasks Done</h2>
-<ul>
-    <li>Finish project feature list and scope
-    <li>Set up Github repo
-    <li>Add login page and sign up page (does nothing right now)
-    <li>Link the login pages on the main page
-    <li>Create ER diagram and relational schema
-    <li>Add canvas to display game
-    <li>Create Database Table
-    <li>Implement falling blocks
-    <li>Add scoring
-    <li>Build basic UI for site
-    <li>Fix clipping issues
-</ul>
+<div class="note">
+    Note: UPDATE DML yet to be implemented
+</div>
 
-<h2>Tasks To Do</h2>
-<ul>
-    <li>Return top 10 scores
-    <li>Display leaderboard UI on site with fetched data from scores API
-    <li>Style leaderboard table
-    <li>Make game over state and have it call score API
-    <li>Implement register pages that add to user table and compare from user table
-    <li>Implement password hashing
-    <li>Make it so only logged in users can submit to leaderboard
-    <li>Add working logout button
-    <li>Implement line clearing and more points when that happens
-    <li>Implement Tetrises
-    <li>Implement rotation of blocks
-</ul>
 
-<h2>Tasks Update</h2>
-<ul>
-    <li>Fix annoying issue with the canvas moving as score increases
-    <li>Fix broken register pages UI and remove forgot password
-    <li>Add more UI elements so it's not to barren
-</ul>
+<pre>
+<img src="./media/example-game.png" alt="Screenshot of the Tetris web game">
+</pre>
 
-<h3>Images to depict my vision for the end of project</h3>
+<h2>Application Features</h2>
 
-What the project is like right now <br>
-<img src="./media/current.png">
+<h3>User</h3>
+<p>The user can play a game of Tetris but if not logged in then the game will not save the score. If a user wants their score to be saved then they will need to make an account and login. Once the user logs in they will have access to a user page and their scores will be saved. On the user page they can delete any one of their scores if they so choose to, the user will also be able to logout (of course).
+</p>
 
-What is will be after completing all tasks<br>
-<img src="./media/after.png" height="200" width="350">
+<h3>Leaderboard</h3> Scores are submitted when a user loses, the score shows the user who achieved the score, the time, lines cleared, level reached, and rank. It shows the top 25 user scores, that means any one user can only have one score on the leaderboard (their top scores)
+</p>
 
+<div class="warn">
+    This project is a work-in-progress and as such not all desired features may be implemented at the time of reading.
+</div>
+</body>
